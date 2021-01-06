@@ -40,7 +40,7 @@ function onChildProcessExit(child) {
 
   // connection test
   try {
-    const url = `mongodb://${env.MONGO_USER}:${env.MONGO_PASS}@${env.MONGO_HOST||'127.0.0.1'}:${env.MONGO_PORT||27017}/${env.MONGO_DB}`;
+    const url = `mongodb://${env.DATABASE_USERNAME}:${env.DATABASE_PASSWORD}@${env.DATABASE_HOST||'127.0.0.1'}:${env.DATABASE_PORT||27017}/${env.DATABASE_NAME}`;
     console.log(">>> connection url:", url);
     child = spawn('mongo', [
       url,
@@ -61,10 +61,10 @@ function onChildProcessExit(child) {
 
   // create users
   try {
-    const url = `mongodb://${ADMIN_USER}:${ADMIN_PASS}@${env.MONGO_HOST||'127.0.0.1'}:${env.MONGO_PORT||27017}/`;
+    const url = `mongodb://${ADMIN_USER}:${ADMIN_PASS}@${env.DATABASE_HOST||'127.0.0.1'}:${env.DATABASE_PORT||27017}/`;
     child = spawn('mongo', [
       url,
-      '--eval', `db.getSiblingDB('${env.MONGO_DB}').createUser({ user:'${env.MONGO_USER}', pwd: '${env.MONGO_PASS}', roles: [{ role:'readWrite', db:'${env.MONGO_DB}' }] });`
+      '--eval', `db.getSiblingDB('${env.DATABASE_NAME}').createUser({ user:'${env.DATABASE_USERNAME}', pwd: '${env.DATABASE_PASSWORD}', roles: [{ role:'readWrite', db:'${env.DATABASE_NAME}' }] });`
     ], {
       //stdio: ['pipe', 'pipe', 'pipe'] // stdin, stdout, stderr
       stdio: [process.stdin, process.stdout, process.stderr]

@@ -2,7 +2,7 @@ const sqlite = {
   connector: 'bookshelf',
   settings: {
     client: 'sqlite',
-    filename: '.tmp/data.db',
+    filename: process.env.DATABASE_NAME, //'.tmp/data.db',
   },
   options: {
     // debug: true,
@@ -14,11 +14,11 @@ const postgres = {
   connector: 'bookshelf',
   settings: {
     client: 'postgres',
-    database: 'strapi',
-    username: 'strapi',
-    password: 'strapi',
-    port: 5432,
-    host: 'localhost',
+    database: process.env.DATABASE_NAME,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    port: process.env.DATABASE_PORT,
+    host: process.env.DATABASE_HOST,
   },
   options: {},
 };
@@ -27,11 +27,11 @@ const mysql = {
   connector: 'bookshelf',
   settings: {
     client: 'mysql',
-    database: 'strapi',
-    username: 'strapi',
-    password: 'strapi',
-    port: 3306,
-    host: 'localhost',
+    database: process.env.DATABASE_NAME,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    port: process.env.DATABASE_PORT,
+    host: process.env.DATABASE_HOST,
   },
   options: {},
 };
@@ -39,11 +39,11 @@ const mysql = {
 const mongo = {
   connector: 'mongoose',
   settings: {
-    database: process.env.MONGO_DB,
-    username: process.env.MONGO_USER,
-    password: process.env.MONGO_PASS,
-    port: 27017,
-    host: 'localhost',
+    database: process.env.DATABASE_NAME,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    port: process.env.DATABASE_PORT,
+    host: process.env.DATABASE_HOST,
   },
   options: {},
 };

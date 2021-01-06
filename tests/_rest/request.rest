@@ -1,0 +1,114 @@
+
+@PREFIX = ''
+@BASE_URL = http://localhost:1337{{PREFIX}}
+####@BASE_URL = http://192.168.0.102{{PREFIX}}
+
+# Noop
+GET {{BASE_URL}}/noop HTTP/1.1
+###
+
+@email = test001@local.host
+@password = test000
+# auth sign-up
+POST {{BASE_URL}}/auth/local/register  HTTP/1.1
+content-type: application/json
+
+{
+  "username": "test001",
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+###
+
+# send password recovery e-mail
+POST {{BASE_URL}}/auth/forgot-password HTTP/1.1
+content-type: application/json
+
+{
+  "email": "{{email}}",
+  "url": "{{BASE_URL}}/auth/pw-recovery"
+}
+###
+
+# login as guest
+# @name loginAsGuest
+GET {{BASE_URL}}/auth/login-as-guest?id=  HTTP/1.1
+###
+
+####@authToken = {{loginAsGuest.response.body.jwt}}
+####@userId = {{loginAsGuest.response.body.user.id}}
+
+# auth local
+# @name login
+POST {{BASE_URL}}/auth/local HTTP/1.1
+content-type: application/json
+
+{
+  "identifier": "{{email}}",
+  "password": "{{password}}"
+}
+###
+
+@authToken = {{login.response.body.jwt}}
+@userId = {{login.response.body.user.id}}
+
+
+# firebase user local login
+POST {{BASE_URL}}/auth/local-fb HTTP/1.1
+content-type: application/json
+
+{
+  "email": "THZmsxB70Xgn3vczlhzIfuT8Zro1",
+  "provider": "firebase:password",
+  "username": "test001@local.host"
+}
+###
+
+# login with code
+POST {{BASE_URL}}/auth/local-code HTTP/1.1
+content-type: application/json
+
+{
+  "code": "{{login.response.body.jwtCode}}"
+}
+###
+
+#
+# Users
+#
+
+# update user info. PUT /users/
+PUT {{BASE_URL}}/users/{{userId}} HTTP/1.1
+Authorization: bearer {{authToken}}
+content-type: application/json
+
+{
+  "username": "updated_001",
+  "height": 180
+}
+###
+
+# delete user
+DELETE {{BASE_URL}}/users/{{userId}} HTTP/1.1
+Authorization: bearer {{authToken}}
+content-type: application/json
+
+####
+
+# GET /users/check-nickname
+GET {{BASE_URL}}/users/{{userId}}/check-nickname?name=10발눔 HTTP/1.1
+Authorization: bearer {{authToken}}
+###
+
+#
+# Temporary
+#
+GET http://192.168.0.102/nitroapi/jfactivities/history/workout?updatedAt_gte=2020-06-23T05:00:00.000Z&updatedAt_lt=2020-06-23T23:59:59.999Z
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZWFmZGIwYjczMTY3NmI2YzAyN2VhMCIsImlhdCI6MTU5Mjg5NTYwMiwiZXhwIjoxNTkyOTgyMDAyfQ.jlRdEn4kotnd4HUgMYdKnuyuzzx0g5P3WITwuSV5WJM
+###
+
+GET http://192.168.0.102/nitroapi/users/me
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZWFmZGIwYjczMTY3NmI2YzAyN2VhMCIsImlhdCI6MTU5Mjg5NTYwMiwiZXhwIjoxNTkyOTgyMDAyfQ.jlRdEn4kotnd4HUgMYdKnuyuzzx0g5P3WITwuSV5WJM
+###

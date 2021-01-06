@@ -1,0 +1,92 @@
+#
+# GraphQL Query
+# 
+# Playground: http://localhost:1337/nitroapi/graphql
+#
+
+
+@GRAPHQL_ENDPOINT = /graphql
+@BASE_URL = http://localhost:1337/nitroapi
+@GRAPHQL_URL = {{BASE_URL}}{{GRAPHQL_ENDPOINT}}
+
+@email = test001@local.host
+@password = test000
+
+# auth local
+# @name loginReq
+POST {{BASE_URL}}/auth/local HTTP/1.1
+Content-Type: application/json
+
+{
+  "identifier": "{{email}}",
+  "password": "{{password}}"
+}
+###
+@authToken = {{loginReq.response.body.jwt}}
+@userID = {{loginReq.response.body.user.id}}
+
+# query jfactivities
+POST {{GRAPHQL_URL}} HTTP/1.1
+Content-Type: application/json
+Authorization: bearer {{authToken}}
+X-REQUEST-TYPE: GraphQL
+
+query ($sort: String, $limit: Int, $start: Int, $where: JSON) {
+  jfactivities(sort: $sort, limit: $limit, start: $start, where: $where) {
+    actid id
+  }
+}
+
+{
+  "sort": "actid:desc", "limit": 5, "start": 0, "where": {"actid":2415919107}
+}
+###
+
+# create an entry
+# @name newEntryReq
+POST {{GRAPHQL_URL}} HTTP/1.1
+Content-Type: application/json
+Authorization: bearer {{authToken}}
+X-REQUEST-TYPE: GraphQL
+
+mutation ($input: createJfactivityInput) {
+  createJfactivity(input: $input) {
+    jfactivity {
+      id
+    }
+  }
+}
+
+{
+  "input": { "data": {
+    "devid": "012345678901234567890123",
+    "actid":2415919107,
+    "user": "{{userID}}"
+  }}
+}
+###
+@createdEntryID = {{newEntryReq.response.body.data.createJfactivity.jfactivity.id}}
+
+# update
+POST {{GRAPHQL_URL}} HTTP/1.1
+Content-Type: application/json
+Authorization: bearer {{authToken}}
+X-REQUEST-TYPE: GraphQL
+
+mutation ($input: updateJfactivityInput) {
+  updateJfactivity(input: $input) {
+    jfactivity {
+      data
+    }
+  }
+}
+
+{
+  "input": {
+    "where": "{{createdEntryID}}",
+    "data": {
+      "data": ""
+    },
+  }
+}
+###

@@ -7,15 +7,17 @@
     "dev": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
-    "strapi": "strapi"
+    "strapi": "strapi",
+    "test": "jest --config ./jest.config.js --forceExit --detectOpenHandles",
+    "test:unit": "jest --config ./jest.config.js --forceExit --detectOpenHandles ./tests/units/*",
+    "test:e2e": "TARGET_SERVER=internal jest --config ./jest.e2e.config.js --forceExit --detectOpenHandles ./tests/e2e/*",
+    "test:e2e:local": "TARGET_SERVER=local jest --config ./jest.e2e.config.js --forceExit --detectOpenHandles ./tests/e2e/*",
+    "test:e2e:dev": "TARGET_SERVER=dev jest --config ./jest.e2e.config.js --forceExit --detectOpenHandles ./tests/e2e/*",
+    "test:e2e:prod": "TARGET_SERVER=prod jest --config ./jest.e2e.config.js --forceExit --detectOpenHandles ./tests/e2e/*"
   },
   "dependencies": {
-    "knex": "^0.20.0",
     "lodash": "^4.17.5",
     "my-api-utils": "*",
-    "mysql": "^2.17.1",
-    "pg": "^7.10.0",
-    "sqlite3": "^4.0.6",
     "strapi": "*",
     "strapi-admin": "*",
     "strapi-connector-bookshelf": "*",
@@ -32,6 +34,15 @@
     "strapi-provider-upload-aws-s3": "*",
     "strapi-provider-upload-cloudinary": "*",
     "strapi-utils": "*"
+  },
+  "devDependencies": {
+    "knex": "^0.20.0",
+    "mysql": "^2.17.1",
+    "pg": "^7.10.0",
+    "sqlite3": "^4.0.6",
+
+    "jest": "26.1.0",
+    "supertest": "^4.0.2"
   },
   "strapi": {
     "uuid": "getstarted"

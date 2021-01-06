@@ -1,6 +1,20 @@
 {
   "name": "my-api-utils",
   "version": "1.0.0",
+  "description": "Utils for local api",
   "main": "index.js",
-  "license": "MIT"
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest ./lib"
+  },
+  "author": "",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "jest": "26.1.0",
+    "lodash": "^4.17.15",
+    "prettier": "^1.18.2"
+  }
 }
