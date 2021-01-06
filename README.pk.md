@@ -29,3 +29,14 @@ git pull strapi v3.0.6
 cp -r strapi/examples/getstarted/* ./
 
 ```
+
+## Tools
+
+### Initial setup
+
+#### Database
+
+```sh
+# create database and users
+node tools/setup/mongodb.js
+```

@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 "use strict";
 
+/**
+ * Create datababse users
+ * 
+ * mongo mongodb://myroot:root000@127.0.0.1:27017/ --eval "db.getSiblingDB('strapi').createUser({ user:'strapi', pwd: 'strapi', roles: [{ role:'readWrite', db:'strapi' }] });"
+ */
+
 //
 // load .env
 //
@@ -38,7 +44,7 @@ function onChildProcessExit(child) {
     console.log(">>> connection url:", url);
     child = spawn('mongo', [
       url,
-      '--eval', `"show users"`
+      '--eval', `db.getCollectionNames()`
     ], {
       stdio: [process.stdin, process.stdout, process.stderr]
     });
@@ -53,11 +59,12 @@ function onChildProcessExit(child) {
     }
   }
 
+  // create users
   try {
     const url = `mongodb://${ADMIN_USER}:${ADMIN_PASS}@${env.MONGO_HOST||'127.0.0.1'}:${env.MONGO_PORT||27017}/`;
     child = spawn('mongo', [
       url,
-      '--eval', `"db.createUser({ user:'${env.MONGO_USER}', pwd: '${env.MONGO_PASS}', roles: [{ role:'readWrite', db:'${env.MONGO_DB}' }] });"`
+      '--eval', `db.getSiblingDB('${env.MONGO_DB}').createUser({ user:'${env.MONGO_USER}', pwd: '${env.MONGO_PASS}', roles: [{ role:'readWrite', db:'${env.MONGO_DB}' }] });`
     ], {
       //stdio: ['pipe', 'pipe', 'pipe'] // stdin, stdout, stderr
       stdio: [process.stdin, process.stdout, process.stderr]
