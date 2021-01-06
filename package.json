@@ -1,0 +1,87 @@
+{
+  "name": "getstarted",
+  "private": true,
+  "version": "3.0.6",
+  "description": "A Strapi application.",
+  "scripts": {
+    "dev": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "knex": "^0.20.0",
+    "lodash": "^4.17.5",
+    "mysql": "^2.17.1",
+    "pg": "^7.10.0",
+    "sqlite3": "^4.0.6",
+    "strapi": "3.0.6",
+    "strapi-admin": "3.0.6",
+    "strapi-connector-bookshelf": "3.0.6",
+    "strapi-connector-mongoose": "3.0.6",
+    "strapi-middleware-views": "3.0.6",
+    "strapi-plugin-content-manager": "3.0.6",
+    "strapi-plugin-content-type-builder": "3.0.6",
+    "strapi-plugin-documentation": "3.0.6",
+    "strapi-plugin-email": "3.0.6",
+    "strapi-plugin-graphql": "3.0.6",
+    "strapi-plugin-upload": "3.0.6",
+    "strapi-plugin-users-permissions": "3.0.6",
+    "strapi-provider-email-mailgun": "3.0.6",
+    "strapi-provider-upload-aws-s3": "3.0.6",
+    "strapi-provider-upload-cloudinary": "3.0.6",
+    "strapi-utils": "3.0.6"
+  },
+  "strapi": {
+    "uuid": "getstarted"
+  },
+  "engines": {
+    "node": ">=10.10.0",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT",
+  "workspaces": [
+    "packages/my-api-utils",
+
+    "strapi/packages/create-strapi-app",
+    "strapi/packages/strapi",
+    "strapi/packages/strapi-admin",
+    "strapi/packages/strapi-connector-bookshelf",
+    "strapi/packages/strapi-connector-mongoose",
+    "strapi/packages/strapi-database",
+
+    "strapi/packages/strapi-generate",
+    "strapi/packages/strapi-generate-api",
+    "strapi/packages/strapi-generate-controller",
+    "strapi/packages/strapi-generate-model",
+    "strapi/packages/strapi-generate-new",
+    "strapi/packages/strapi-generate-plugin",
+    "strapi/packages/strapi-generate-policy",
+    "strapi/packages/strapi-generate-service",
+
+    "strapi/packages/strapi-helper-plugin",
+    "strapi/packages/strapi-hook-ejs",
+    "strapi/packages/strapi-hook-redis",
+    "strapi/packages/strapi-middleware-views",
+
+    "strapi/packages/strapi-plugin-content-manager",
+    "strapi/packages/strapi-plugin-content-type-builder",
+    "strapi/packages/strapi-plugin-documentation",
+    "strapi/packages/strapi-plugin-email",
+    "strapi/packages/strapi-plugin-graphql",
+    "strapi/packages/strapi-plugin-upload",
+    "strapi/packages/strapi-plugin-users-permissions",
+
+    "strapi/packages/strapi-provider-email-amazon-ses",
+    "strapi/packages/strapi-provider-email-mailgun",
+    "strapi/packages/strapi-provider-email-sendgrid",
+    "strapi/packages/strapi-provider-email-sendmail",
+
+    "strapi/packages/strapi-provider-upload-local",
+    "strapi/packages/strapi-provider-upload-aws-s3",
+    "strapi/packages/strapi-provider-upload-cloudinary",
+    "strapi/packages/strapi-provider-upload-rackspace",
+
+    "strapi/packages/strapi-utils"
+  ]
+}
