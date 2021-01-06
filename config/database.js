@@ -39,9 +39,9 @@ const mysql = {
 const mongo = {
   connector: 'mongoose',
   settings: {
-    database: 'strapi',
-    username: 'root',
-    password: 'strapi',
+    database: process.env.MONGO_DB,
+    username: process.env.MONGO_USER,
+    password: process.env.MONGO_PASS,
     port: 27017,
     host: 'localhost',
   },

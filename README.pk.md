@@ -2,7 +2,11 @@
 
 ## Merge sequence
 
+### merge strapi
+
 ```sh
+cd strapi
+
 # add original strapi repository
 git remote add strapi https://github.com/strapi/strapi.git
 
@@ -16,4 +20,12 @@ git checkout -b my3.0.6
 git pull strapi v3.0.6
 
 # resolve conflicts and commits
+```
+
+### merge example
+
+```sh
+# copy example files
+cp -r strapi/examples/getstarted/* ./
+
 ```
