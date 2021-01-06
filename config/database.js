@@ -1,4 +1,15 @@
-const sqlite = {
+"use strict";
+/**
+ * database.js
+ *
+ * # access
+ * strapi.config.get('database.connections.default.connector', defaultConnector);
+ *
+ * # documentation
+ * https://strapi.io/documentation/v3.x/concepts/configurations.html#database
+ */
+
+ const sqlite = {
   connector: 'bookshelf',
   settings: {
     client: 'sqlite',
@@ -55,9 +66,26 @@ const db = {
   mongo,
 };
 
-module.exports = {
-  defaultConnection: 'default',
-  connections: {
-    default: process.env.DB ? db[process.env.DB] || db.sqlite : db.sqlite,
-  },
+module.exports = ({ env }) => {
+  if (!process.env.DB) {
+    //throw new Error("!!! DB variable is not set");
+  } else {
+    const defaultDb = db[process.env.DB];
+    defaultDb.settings = {
+      ...defaultDb.settings,
+      host: env("DATABASE_HOST", defaultDb.settings.host),
+      port: env.int("DATABASE_PORT", defaultDb.settings.port),
+      database: env("DATABASE_NAME"),
+      username: env("DATABASE_USERNAME"),
+      password: env("DATABASE_PASSWORD"),
+    };
+    console.log(">>> Database:", defaultDb.settings.client, defaultDb.settings.database);
+  }
+
+  return {
+    defaultConnection: "default",
+    connections: {
+      default: db[process.env.DB],
+    },
+  };
 };
