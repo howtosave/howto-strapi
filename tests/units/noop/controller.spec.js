@@ -32,19 +32,23 @@ const mockItemsData = [
   {
     key: `key-001`,
     keyslug: `key_001`,
-    name: {
+    compName: {
       value: `name-001`,
     },
-    value: [
+    compValues: [
       {
         __component: "noop.numvalue",
         value: 1,
+      },
+      {
+        __component: "noop.numvalue",
+        value: 2,
       },
     ],
     secure: `password-001`,
     file: null,
     text: `text 001`,
-    rechtext: `richtext 001`,
+    richtext: `#richtext 001 \n- one line`,
     email: `email-001@local.host`,
     integer: 0,
     biginteger: 0,
@@ -70,10 +74,20 @@ async function insertTestData() {
   return res;
 }
 
+async function deleteTestData() {
+  //console.log(Object.keys(strapi.services));
+  const res = [];
+  // add items in sequence
+  for (const item of mockItemsData) {
+    res.push(await strapi.services["noop"].delete(item));
+  }
+  return res;
+}
+
 const _get_noop_items = async (id) =>
   id ? await strapi.services["noop"].findOne({ id }) : await strapi.services["noop"].find({});
 
-describe("# Noop", () => {
+describe.skip("# Noop", () => {
   const { head, get, post, put, delete: delreq } = request(strapi.server);
   let mockItems;
   let mockUsers;
@@ -106,7 +120,6 @@ describe("# Noop", () => {
 
   it("Should return valid response for GET /noop/model/count", async (done) => {
     await get("/noop/model/count")
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
@@ -118,7 +131,6 @@ describe("# Noop", () => {
 
   it("Should return valid response for GET /noop/model/count?{searchQuery}", async (done) => {
     await get(`/noop/model/count?key_eq=${mockItemsData[0].key}`)
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
@@ -130,7 +142,6 @@ describe("# Noop", () => {
 
   it("Should return valid response for GET /noop/model", async (done) => {
     await get("/noop/model")
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
@@ -142,7 +153,6 @@ describe("# Noop", () => {
 
   it("Should return valid response for GET /noop/model?{searchQuery}", async (done) => {
     await get(`/noop/model?key_eq=${mockItemsData[0].key}`)
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
@@ -155,7 +165,6 @@ describe("# Noop", () => {
   it("Should return valid response for GET /noop/model/:id", async (done) => {
     const item = mockItems[0];
     await get(`/noop/model/${item.id}`)
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .expect("Content-Type", /json/)
       .then((res) => {
@@ -175,7 +184,6 @@ describe("# Noop", () => {
     };
 
     await post("/noop/model")
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .send(item)
       .then((res) => {
@@ -190,19 +198,18 @@ describe("# Noop", () => {
   it("Should return valid response for PUT /noop/model/:id", async (done) => {
     const items = await _get_noop_items();
     const updateInput = {
-      name: {
-        value: `${items[0].name.value}_updated`,
+      compName: {
+        value: `${items[0].compName.value}_updated`,
       },
     };
 
     await put(`/noop/model/${items[0].id}`)
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .send(updateInput)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
         expect(res.status).toBe(200);
-        expect(res.body.name.value).toBe(updateInput.name.value);
+        expect(res.body.compName.value).toBe(updateInput.compName.value);
       });
 
     done();
@@ -212,7 +219,6 @@ describe("# Noop", () => {
     const items = await _get_noop_items();
 
     await delreq(`/noop/model/${items[0].id}`)
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
@@ -222,16 +228,36 @@ describe("# Noop", () => {
 
     done();
   });
+});
+
+describe("# Noop model", () => {
+  const { head, get, post, put, delete: delreq } = request(strapi.server);
+  let mockItems;
+  let mockUsers;
+
+  beforeAll(async (done) => {
+    const res = await getTestUsers(controllerPermissions);
+    mockUsers = res.mockUsers;
+    // insert data
+    mockItems = await insertTestData();
+    done();
+  });
+
+  afterAll(async (done) => {
+    await deleteTestUsers();
+    await deleteTestData();
+    done();
+  });
+
 
   /**
-   * *NOTICE* The test below will fail.
+   * *NOTICE* The test below will be failed.
    * For reference only.
    * See how to access each field.
    */
-  it.skip("Should have valid fields", async (done) => {
+  it("Should have valid fields", async (done) => {
     const item = mockItems[0];
     await get(`/noop/model/${item.id}`)
-      .set("accept", "application/json")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .expect("Content-Type", /json/)
       .then((res) => {
@@ -239,16 +265,16 @@ describe("# Noop", () => {
         expect(res.status).toBe(200);
 
         console.log("RES:", res.body);
-        console.log("name(component)", typeof item.name, item.name);
-        console.log("value(dynamiczone)", typeof item.value, item.value);
+        console.log("name(component)", typeof item.compName, item.compName);
+        console.log("value(dynamiczone)", typeof item.compValues, item.compValues);
         console.log("biginteger", typeof item.biginteger, item.biginteger);
         console.log("datetime", typeof item.datetime, item.datetime);
         console.log("json", typeof item.json, item.json);
 
         expect(res.body.key).toBe(item.key);
         expect(res.body.keyslug).toBe(item.keyslug);
-        expect(res.body.name.value).toBe(item.name.value);
-        expect(res.body.value[0].value).toStrictEqual(item.value[0].value);
+        expect(res.body.compName.value).toBe(item.compName.value);
+        expect(res.body.compValues[0].value).toStrictEqual(item.compValues[0].value);
         expect(res.body.secure).toBe(undefined); // <== private field
         expect(res.body.file).toStrictEqual(item.file);
         expect(res.body.text).toBe(item.text);
@@ -266,7 +292,8 @@ describe("# Noop", () => {
         expect(res.body.enumeration).toBe(item.enumeration);
         expect(res.body.json.name).toStrictEqual(item.json.name);
         expect(res.body.uid).toBe(item.uid);
+
+        done();
       });
-    done();
   });
 });

@@ -29,12 +29,13 @@
         "decamelize": true
       }
     },
-    "name": {
+    "compName": {
       "type": "component",
       "component": "noop.strvalue",
-      "required": true
+      "required": true,
+      "repeatable": false
     },
-    "value": {
+    "compValues": {
       "type": "dynamiczone",
       "components": ["noop.strvalue", "noop.numvalue"],
       "repeatable": true
