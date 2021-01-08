@@ -9,8 +9,24 @@
         "prefix": "",
         "description": "users custom api",
         "tag": {
+          "plugin": "users-permissions",
           "name": "User",
           "actionType": "findOne"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/auth/login-as-guest",
+      "handler": "Auth.localAsGuest",
+      "config": {
+        "policies": ["plugins::users-permissions.ratelimit"],
+        "prefix": "",
+        "description": "Login as a guest user",
+        "tag": {
+          "plugin": "users-permissions",
+          "name": "User",
+          "actionType": "create"
         }
       }
     }
