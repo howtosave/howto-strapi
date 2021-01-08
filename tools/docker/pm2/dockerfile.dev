@@ -1,0 +1,30 @@
+#
+# NodeJS PM2 DEV Mode
+#
+# See https://docs.docker.com/engine/reference/builder/
+#
+
+# override an image from dockerfile.pm2
+# NOTE: you need to build the dockerfile.pm2 first
+FROM howto:pm2
+
+# volumes to be bound at runtime
+VOLUME [ "/workdir" ]
+
+# env mode
+ENV NODE_ENV development
+
+# db
+ENV DATABASE_HOST '127.0.0.1'
+
+# goto app directory
+WORKDIR /workdir
+
+# misc
+ENV SECRET_KEY "at-docker-file-pm2-dev"
+
+#
+# run. use pm2-dev on dev mode
+# See https://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/#development-environment
+# use *shell form* for variable substitution
+ENTRYPOINT pm2-runtime ecosystem.config.js --env "$NODE_ENV"

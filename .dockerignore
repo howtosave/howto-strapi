@@ -1,0 +1,10 @@
+**/node_modules
+**/.git
+*.log
+dockerfile.*
+tmp*
+tmp-*
+.tmp
+.cache
+tests
+tools

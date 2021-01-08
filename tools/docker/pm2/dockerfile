@@ -1,0 +1,65 @@
+#
+# NodeJS PM2 Mode
+#
+# See https://docs.docker.com/engine/reference/builder/
+#
+
+# Use debian stretch(v9.0)
+# See https://nickjanetakis.com/blog/benchmarking-debian-vs-alpine-as-a-base-docker-image
+# See https://hub.docker.com/r/keymetrics/pm2 for other options
+FROM keymetrics/pm2:12-stretch
+
+# pm2 installation
+#RUN pm2 install pm2-server-monit
+
+#
+# arguments
+#
+ARG volume_ro=/volume-ro
+ARG volume_rw=/volume-rw
+
+RUN echo "ARGs: volume_ro: ${volume_ro}, volume_rw: ${volume_rw}"
+
+#
+# node env
+#
+ENV NODE_ENV production
+
+#
+# directories and volumes
+#
+
+# read-write
+ENV UPLOAD_DIR "${volume_rw}/upload"
+ENV LOG_DIR "${volume_rw}/log/pm2"
+
+# volumes to be bound at runtime
+VOLUME [ "${volume_ro}", "${volume_rw}" ]
+
+#
+# host
+#
+
+# NOT 127.0.0.1 but 0.0.0.0
+ENV HOST '0.0.0.0'
+ENV DATABASE_HOST '10.178.0.2'
+
+#
+# copy and install
+#
+
+# Create and goto app directory
+WORKDIR /usr/src/app
+
+# Bundle app source
+COPY . .
+RUN yarn install --frozen-lockfile
+RUN ls -al
+
+# misc
+ENV SECRET_KEY "at-docker-file-pm2"
+
+#
+# run
+# use *shell form* for variable substitution
+ENTRYPOINT pm2-runtime ecosystem.config.js --env ${NODE_ENV}

@@ -50,6 +50,7 @@ const mysql = {
 const mongo = {
   connector: 'mongoose',
   settings: {
+    client: 'mongodb',
     database: process.env.DATABASE_NAME,
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
@@ -79,7 +80,7 @@ module.exports = ({ env }) => {
       username: env("DATABASE_USERNAME"),
       password: env("DATABASE_PASSWORD"),
     };
-    console.log(">>> Database:", defaultDb.settings.client, defaultDb.settings.database);
+    console.log(">>> Database:", `${defaultDb.settings.client}: ${defaultDb.settings.host}:${defaultDb.settings.port}/${defaultDb.settings.database}`);
   }
 
   return {
