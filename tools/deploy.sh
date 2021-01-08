@@ -16,12 +16,18 @@
 #
 # *****************************************************************
 
-_DEPLOY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-ROOT_DIR=${_DEPLOY_DIR}/..
+#
+# constants
+#
+PROJECT_ID=howto-strapi
 STAGE_DIR=/var/stage/howto-strapi
 
+
+_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ROOT_DIR=${_SCRIPT_DIR}/..
+
 # parse arguments and set BUILD_UI, PUSH_ONLY, DEPLOY_ENV, TARGET_USER, TARGET_SERVER
-source "$_DEPLOY_DIR/_deploy_parse_args.sh"
+source "$_SCRIPT_DIR/_deploy_parse_args.sh"
 #echo "$BUILD_UI, $PUSH_ONLY, $DEPLOY_ENV, $TARGET_USER, $TARGET_SERVER"
 
 # set STAGE_DIR, SVC_USER
@@ -98,6 +104,17 @@ fi
 
 if [ "${IS_LOCAL_DEPLOYMENT}" == "true" ]; then
   # pm2 deployment
+  if [ ! -d "/srv/prod/${PROJECT_ID}" ]; then
+    # deploy-setup
+    echo ">>> LOCAL pm2 deploy-setup"
+    echo
+    SVC_USER=${SVC_USER} pm2 deploy ecosystem.config.js ${DEPLOY_ENV} setup
+    if [ "$?" != "0" ]; then
+      echo "!!! pm2-deploy-setup failed."
+      exit 1
+    fi
+  fi
+
   echo ">>> LOCAL pm2 deploy"
   echo
   SVC_USER=${SVC_USER} BUILD_UI=${BUILD_UI} pm2 deploy ecosystem.config.js ${DEPLOY_ENV} --force
