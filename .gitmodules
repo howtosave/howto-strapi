@@ -1,0 +1,3 @@
+[submodule "strapi"]
+	path = strapi
+	url = https://github.com/aistyler/carbon-strapi.git
