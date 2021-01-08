@@ -135,13 +135,13 @@ module.exports = {
         const { data, files } = parseMultipartData(ctx);
         entity = await strapi.services.noop.create(data, { files });
       } else {
-        console.log(">>>>>>>>>>>", ctx.request.body);
+        strapi.log.debug(">>>>>>>>>>>", ctx.request.body);
         entity = await strapi.services.noop.create(ctx.request.body);
       }
       return sanitizeEntity(entity, { model: strapi.models.noop });
     } catch (e) {
-      console.error(">>>>>>>>>>>>>>", e.name);
-      console.error(JSON.stringify(e));
+      strapi.log.error(">>>>>>>>>>>>>>", e.name);
+      strapi.log.error(JSON.stringify(e));
       let err;
       const isdbg = true;
       if (e.name === "MongoError") {

@@ -1,0 +1,24 @@
+
+##
+## Authentication
+##
+
+@BASE_URL = http://localhost:1337
+
+# Noop
+GET {{BASE_URL}}/noop HTTP/1.1
+###
+
+# login as guest
+# @name loginAsGuest
+GET {{BASE_URL}}/auth/login-as-guest?id=  HTTP/1.1
+###
+
+@authToken = {{loginAsGuest.response.body.jwt}}
+@userId = {{loginAsGuest.response.body.user.id}}
+@email = {{loginAsGuest.response.body.user.email}}
+
+# get user info
+GET {{BASE_URL}}/users/me HTTP/1.1
+Authorization: bearer {{authToken}}
+###

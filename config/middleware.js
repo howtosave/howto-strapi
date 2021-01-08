@@ -10,7 +10,7 @@ module.exports = ({ env }) => ({
       defaultIndex: true,
     },
     favicon: {
-      path: "./public/favicon.ico",
+      path: "./favicon.ico",
     },
     router: {
       prefix: env("URL_PREFIX", ""),
