@@ -84,6 +84,7 @@ public/uploads/*
 !public/uploads/.gitkeep
 .env
 build/
+*.local
 
 ############################
 # Node.js
