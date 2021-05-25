@@ -1,0 +1,3 @@
+# .gitignore
+
+volume/var/mongo

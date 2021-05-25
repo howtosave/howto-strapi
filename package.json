@@ -5,10 +5,13 @@
   "description": "A Strapi application.",
   "scripts": {
     "dev": "strapi develop",
+    "develop:ce": "STRAPI_DISABLE_EE=true strapi dev",
     "start": "NODE_ENV=production node server.js",
     "start:dev": "NODE_ENV=development node server.js",
     "build:ui": "strapi build --clean",
+    "build:ce": "STRAPI_DISABLE_EE=true strapi build:ui",
     "deploy:local": "./tools/deploy.sh svc00@127.0.0.1 -e dev",
+    "docker:run": "./tools/docker/mongo/run.sh --detach",
     "test": "jest --config ./jest.config.js --forceExit --detectOpenHandles",
     "test:unit": "jest --config ./jest.config.js --forceExit --detectOpenHandles ./tests/units/*",
     "test:e2e": "TARGET_SERVER=internal jest --config ./jest.e2e.config.js --forceExit --detectOpenHandles ./tests/e2e/*",
@@ -29,6 +32,7 @@
     "strapi-plugin-documentation": "*",
     "strapi-plugin-email": "*",
     "strapi-plugin-graphql": "*",
+    "strapi-plugin-i18n": "*",
     "strapi-plugin-upload": "*",
     "strapi-plugin-users-permissions": "*",
     "strapi-provider-email-mailgun": "*",
@@ -57,6 +61,7 @@
     "packages/my-api-utils",
 
     "strapi/packages/create-strapi-app",
+    "strapi/packages/create-strapi-starter",
     "strapi/packages/strapi",
     "strapi/packages/strapi-admin",
     "strapi/packages/strapi-connector-bookshelf",
@@ -82,17 +87,20 @@
     "strapi/packages/strapi-plugin-documentation",
     "strapi/packages/strapi-plugin-email",
     "strapi/packages/strapi-plugin-graphql",
+    "strapi/packages/strapi-plugin-i18n",
+    "strapi/packages/strapi-plugin-sentry",
     "strapi/packages/strapi-plugin-upload",
     "strapi/packages/strapi-plugin-users-permissions",
 
     "strapi/packages/strapi-provider-email-amazon-ses",
     "strapi/packages/strapi-provider-email-mailgun",
+    "strapi/packages/strapi-provider-email-nodemailer",
     "strapi/packages/strapi-provider-email-sendgrid",
     "strapi/packages/strapi-provider-email-sendmail",
 
-    "strapi/packages/strapi-provider-upload-local",
     "strapi/packages/strapi-provider-upload-aws-s3",
     "strapi/packages/strapi-provider-upload-cloudinary",
+    "strapi/packages/strapi-provider-upload-local",
     "strapi/packages/strapi-provider-upload-rackspace",
 
     "strapi/packages/strapi-utils"
