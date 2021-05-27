@@ -20,7 +20,16 @@ require("dotenv").config({
 
 const { spawn } = require('child_process');
 const ADMIN_USER='myroot';
-const ADMIN_PASS='root000';
+const ADMIN_PASS='myroot000';
+
+const options = {
+  DATABASE_HOST: "127.0.0.1",
+  DATABASE_PORT: 17017,
+  DATABASE_NAME: "strapi-dev",
+  DATABASE_USERNAME: "strapi",
+  DATABASE_PASSWORD: "strapi",
+
+}
 
 function onChildProcessExit(child) {
   return new Promise((resolve, reject) => {
@@ -35,12 +44,13 @@ function onChildProcessExit(child) {
   });
 }
 
-( async ({env}) => {
+( async ({options}) => {
   let child;
 
   // connection test
   try {
-    const url = `mongodb://${env.DATABASE_USERNAME}:${env.DATABASE_PASSWORD}@${env.DATABASE_HOST||'127.0.0.1'}:${env.DATABASE_PORT||27017}/${env.DATABASE_NAME}`;
+    // try to connect with the user
+    const url = `mongodb://${options.DATABASE_USERNAME}:${options.DATABASE_PASSWORD}@${options.DATABASE_HOST||'127.0.0.1'}:${options.DATABASE_PORT||27017}/${options.DATABASE_NAME}`;
     console.log(">>> connection url:", url);
     child = spawn('mongo', [
       url,
@@ -49,6 +59,7 @@ function onChildProcessExit(child) {
       stdio: [process.stdin, process.stdout, process.stderr]
     });
     await onChildProcessExit(child);
+    // done
     return;
   } catch (e) {
     console.error(e.message);
@@ -58,13 +69,14 @@ function onChildProcessExit(child) {
       child.kill();
     }
   }
-
+  // failed to connect to the database
   // create users
   try {
-    const url = `mongodb://${ADMIN_USER}:${ADMIN_PASS}@${env.DATABASE_HOST||'127.0.0.1'}:${env.DATABASE_PORT||27017}/`;
+    const url = `mongodb://${ADMIN_USER}:${ADMIN_PASS}@${options.DATABASE_HOST||'127.0.0.1'}:${options.DATABASE_PORT||27017}/`;
     child = spawn('mongo', [
       url,
-      '--eval', `db.getSiblingDB('${env.DATABASE_NAME}').createUser({ user:'${env.DATABASE_USERNAME}', pwd: '${env.DATABASE_PASSWORD}', roles: [{ role:'readWrite', db:'${env.DATABASE_NAME}' }] });`
+      '--eval', 
+      `db.getSiblingDB('${options.DATABASE_NAME}').createUser({ user:'${options.DATABASE_USERNAME}', pwd: '${options.DATABASE_PASSWORD}', roles: [{ role:'readWrite', db:'${options.DATABASE_NAME}' }] });`
     ], {
       //stdio: ['pipe', 'pipe', 'pipe'] // stdin, stdout, stderr
       stdio: [process.stdin, process.stdout, process.stderr]
@@ -79,4 +91,4 @@ function onChildProcessExit(child) {
     }
   }
 
-})({env:process.env});
+})({options});

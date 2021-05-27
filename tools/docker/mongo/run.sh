@@ -5,7 +5,7 @@
 
 CONTAINRER_NAME="carboncms-mongo-dev"
 IMAGE_NAME="carboncms:mongo"
-LOCAL_BIND_PORT=17017
+LOCAL_BIND_PORT=27017
 
 _usage() {
     echo
