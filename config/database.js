@@ -39,10 +39,10 @@ const mysql = {
 const mongo = {
   connector: 'mongoose',
   settings: {
-    database: 'strapi-dev',//process.env.DATABASE || 'strapi',
-    username: 'myroot', //process.env.DATABASE_USERNAME || 'root',
-    password: 'myroot000', //process.env.DATABASE_PASSWORD || 'strapi',
-    port: 27017, //process.env.DATABASE_PORT || 27017,
+    database: 'strapi-dev',
+    username: 'myroot',
+    password: 'myroot000',
+    port: 27017,
     host: 'localhost',
   },
   options: {},
@@ -55,9 +55,9 @@ const db = {
   mongo,
 };
 
-module.exports = ({env}) => ({
+module.exports = {
   defaultConnection: 'default',
   connections: {
-    default: env('DB') ? db[env('DB', 'sqlite')] : db.sqlite,
+    default: process.env.DB ? db[process.env.DB] || db.sqlite : db.sqlite,
   },
-});
+};

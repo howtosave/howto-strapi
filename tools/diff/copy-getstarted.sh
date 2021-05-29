@@ -3,8 +3,6 @@
 # generate strapi diff
 #
 
-DIFF_VERSION="3.6.1"
-
 _SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ROOT="$_SCRIPT_DIR/../.." # TODO realpath on mac
 
@@ -16,7 +14,7 @@ if [[ ! -z $(git status --porcelain) ]]; then
   # exit 1
 fi
 
-echo ">>> Copy getstarted for $DIFF_VERSION"
+echo ">>> Copy getstarted from strapi/examples/getstarted"
 
 TARGET_FILES=(
   'api'
@@ -27,6 +25,7 @@ TARGET_FILES=(
   'mkddlewares'
   'plugins'
   'public'
+  '.env.example'
 )
 
 ROOT_STRAPI="$ROOT/strapi/examples/getstarted"

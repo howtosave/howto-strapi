@@ -1,28 +1,71 @@
+diff --git a/packages/strapi-admin/admin/src/containers/App/index.js b/packages/strapi-admin/admin/src/containers/App/index.js
+index 37c5bd381..64a2be146 100644
+--- a/packages/strapi-admin/admin/src/containers/App/index.js
++++ b/packages/strapi-admin/admin/src/containers/App/index.js
+@@ -79,23 +79,8 @@ function App(props) {
+         const { uuid } = data;
+ 
+         if (uuid) {
+-          try {
+-            const deviceId = await getUID();
+-
+-            fetch('https://analytics.strapi.io/track', {
+-              method: 'POST',
+-              body: JSON.stringify({
+-                event: 'didInitializeAdministration',
+-                uuid,
+-                deviceId,
+-              }),
+-              headers: {
+-                'Content-Type': 'application/json',
+-              },
+-            });
+-          } catch (e) {
+-            // Silent.
+-          }
++          // [PK] removed useless code
++          data.deviceId = await getUID();
+         }
+ 
+         getDataRef.current(data);
 diff --git a/packages/strapi-admin/admin/src/containers/Onboarding/index.js b/packages/strapi-admin/admin/src/containers/Onboarding/index.js
-index 25cc59b21..9fd15ad77 100644
+index 25cc59b21..0c9642fd2 100644
 --- a/packages/strapi-admin/admin/src/containers/Onboarding/index.js
 +++ b/packages/strapi-admin/admin/src/containers/Onboarding/index.js
-@@ -20,6 +20,11 @@ const OnboardingVideos = () => {
+@@ -19,29 +19,10 @@ const OnboardingVideos = () => {
+   const [reducerState, dispatch] = useReducer(reducer, initialState, init);
    const { isLoading, isOpen, videos } = reducerState.toJS();
  
-   useEffect(() => {
-+    // [PK] hide video
-+    dispatch({
-+      type: 'HIDE_VIDEO_ONBOARDING',
-+    });
-+
-     const getData = async () => {
-       try {
-         const { data } = await axios.get('https://strapi.io/videos', {
-@@ -40,7 +45,7 @@ const OnboardingVideos = () => {
-       }
-     };
- 
+-  useEffect(() => {
+-    const getData = async () => {
+-      try {
+-        const { data } = await axios.get('https://strapi.io/videos', {
+-          timeout: 1000,
+-        });
+-        const { didWatchVideos, videos } = formatVideoArray(data);
+-
+-        dispatch({
+-          type: 'GET_DATA_SUCCEEDED',
+-          didWatchVideos,
+-          videos,
+-        });
+-      } catch (err) {
+-        console.error(err);
+-        dispatch({
+-          type: 'HIDE_VIDEO_ONBOARDING',
+-        });
+-      }
+-    };
+-
 -    getData();
-+    //getData();
-   }, []);
+-  }, []);
++  // [PK] removed useless code
++  dispatch({
++    type: 'HIDE_VIDEO_ONBOARDING',
++  });
  
    // Hide the player in case of request error
+   if (isLoading) {
 diff --git a/packages/strapi-connector-mongoose/lib/buildQuery.js b/packages/strapi-connector-mongoose/lib/buildQuery.js
 index 379206b4b..f475d8db7 100644
 --- a/packages/strapi-connector-mongoose/lib/buildQuery.js
@@ -272,6 +315,20 @@ index e1159f47c..b2add045a 100644
  
      const modules = await loadModules(this);
  
+diff --git a/packages/strapi/lib/commands/develop.js b/packages/strapi/lib/commands/develop.js
+index 833f89347..fcb065c9e 100644
+--- a/packages/strapi/lib/commands/develop.js
++++ b/packages/strapi/lib/commands/develop.js
+@@ -25,7 +25,8 @@ module.exports = async function({ build, watchAdmin, polling, browser }) {
+   // Don't run the build process if the admin is in watch mode
+   if (build && !watchAdmin && serveAdminPanel && !buildExists) {
+     try {
+-      execa.shellSync('npm run -s build -- --no-optimization', {
++      // [PK] change script name
++      execa.shellSync('npm run -s build:admin', {
+         stdio: 'inherit',
+       });
+     } catch (err) {
 diff --git a/packages/strapi/lib/core/app-configuration/index.js b/packages/strapi/lib/core/app-configuration/index.js
 index 8abff52d5..a6265704c 100644
 --- a/packages/strapi/lib/core/app-configuration/index.js
