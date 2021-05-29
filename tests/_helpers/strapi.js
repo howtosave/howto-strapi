@@ -1,9 +1,9 @@
 const Strapi = require('strapi');
 const http = require('http');
 
-let instance;
+var instance;
 
-async function setupStrapi(start=false) {
+async function startStrapi(start=false) {
   if (!instance) {
     /** 
      * The following code is copied from start() and listen()
@@ -20,24 +20,23 @@ async function setupStrapi(start=false) {
 
   if (start) {
     instance.server.listen(
-        instance.config.get('server.port'), 
-        instance.config.get('server.host'), 
-        err => {console.error(err);},
-        () => console.log(">>> test server on port,", instance.config.get('server.port'))
+      instance.config.get('server.port'), 
+      instance.config.get('server.host'), 
+      err => {console.error(err);},
+      () => console.log(">>> test server on port,", instance.config.get('server.port'))
     );
-    
   }
 
   return instance;
 }
 
-async function shutdownStrapi() {
-  await instance.server.close(() => {
+async function stopStrapi() {
+  instance && await instance.server.close(() => {
     process.exit();
   });
 }
 
 module.exports = { 
-  setupStrapi,
-  shutdownStrapi,
+  startStrapi,
+  stopStrapi,
 };

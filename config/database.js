@@ -39,11 +39,11 @@ const mysql = {
 const mongo = {
   connector: 'mongoose',
   settings: {
-    database: 'strapi-dev',
-    username: 'myroot',
-    password: 'myroot000',
-    port: 27017,
-    host: 'localhost',
+    database: process.env.DB_NAME || 'strapi-dev',
+    username: process.env.DB_USER || 'strapi',
+    password: process.env.DB_PASS || 'strapi',
+    port: process.env.DB_PORT || 27017,
+    host: process.env.DB_HOST || 'localhost',
   },
   options: {},
 };

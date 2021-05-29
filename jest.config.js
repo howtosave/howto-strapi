@@ -25,7 +25,7 @@ module.exports = {
   // The test environment that will be used for testing
   testEnvironment: './tests/strapi-test-env.js',
 
-  setupFilesAfterEnv: ['./tests/jest.setup.js'],
+  setupFilesAfterEnv: ['./tests/setup-after-env.js'],
   globals: {
   },
 }
