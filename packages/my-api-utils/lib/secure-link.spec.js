@@ -25,5 +25,4 @@ test("Secure link url", () => {
   );
   expect(res).toBeDefined();
   expect(res.startsWith(baseUrl)).toBe(true);
-  console.log(res);
 });
