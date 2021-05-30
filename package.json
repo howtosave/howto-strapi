@@ -50,6 +50,7 @@
     "sqlite3": "^4.0.6",
 
     "jest": "27.0.3",
+    "jest-environment-node": "27.0.3",
     "supertest": "^4.0.2"
   },
   "strapi": {

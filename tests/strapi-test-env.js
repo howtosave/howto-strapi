@@ -29,7 +29,6 @@ class StrapiEnvironment extends NodeEnvironment {
     if (strapi["carbonKue"]) {
       await strapi.carbonKue.close();
     }
-    await stopStrapi();
     await super.teardown();
   }
 
