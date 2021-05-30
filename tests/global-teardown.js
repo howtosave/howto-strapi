@@ -17,7 +17,7 @@ module.exports = async function() {
     circularSafeReplacerReset();
   } else {
     //console.log("***************** global-teardown.js", Object.keys(this.global));
-    console.log("***************** global-teardown.js: isStrapi:", this.global.strapi !== null);
+    //console.log("***************** global-teardown.js: isStrapi:", this.global.strapi !== null);
     if (this.global.strapi) {
       stopStrapi();
     }

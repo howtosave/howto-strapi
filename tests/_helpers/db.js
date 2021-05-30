@@ -1,6 +1,31 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
 
+async function dropStrapiDB(strapi) {
+  const { connections: connInfo } = strapi.config;
+  await Promise.all(
+    Object.keys(connInfo).map(key => {
+      const conn = connInfo[key];
+      if (conn.connector === 'mongoose') {
+        return strapi.connections[key].connection.db.dropDatabase();
+      }
+      else if (conn.connector === 'bookshelf') {
+        if (conn.settings.client === 'sqlite') {
+          if (fs.existsSync(tmpDbFile)) {
+            return fs.unlink(tmpDbFile);
+          }
+        }
+        else {
+          // TODO
+          //if (conn.settings.client === 'postgres')
+          console.log("*** not implemented");
+        }
+      }
+    })
+  );
+  console.log(">>> dropStrapiDB(): DONE");
+}
+
 async function _mongoConnect() {
   // create db user
   require('../../tools/setup/mongodb');
@@ -52,4 +77,5 @@ async function dropDB(silent=false) {
 
 module.exports = {
   dropDB,
+  dropStrapiDB,
 };

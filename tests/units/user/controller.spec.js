@@ -50,7 +50,7 @@ describe("# User Controllers", () => {
 
   it("GET /users-permissions/custom-route", async () => {
     const res = await req.get("/users-permissions/custom-route")
-      //.set("Authorization", `Bearer ${testUser.jwt}`)
+      .set("Authorization", `Bearer ${testUser.jwt}`)
     if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
     expect(res.status).toBe(200);
     expect(res.text).toBe("allRight");

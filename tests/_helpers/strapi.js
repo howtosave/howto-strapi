@@ -3,9 +3,10 @@ const http = require('http');
 
 var instance;
 
-async function startStrapi(start=false) {
-  if (!instance) {
-    //console.log("*********************** startStrapi(): start new instance");
+async function startStrapi(forceRestart = false, startServer=false) {
+  if (forceRestart || !instance) {
+    forceRestart && await stopStrapi();
+    console.log(">>> startStrapi(): start new instance");
 
     /** 
      * The following code is copied from start() and listen()
@@ -20,7 +21,7 @@ async function startStrapi(start=false) {
     instance.server = http.createServer(instance.app.callback());
   }
 
-  if (start) {
+  if (startServer) {
     instance.server.listen(
       instance.config.get('server.port'), 
       instance.config.get('server.host'), 
@@ -39,9 +40,9 @@ async function stopStrapi() {
     if (tmp["carbonKue"]) {
       await tmp["carbonKue"].close();
     }
-    await tmp.server.close(() => {
-      console.log(">>> strapi's been destroyed");
-    });
+    await tmp.server.close(() => { });
+    
+    console.log(">>> strapi's been destroyed");
   }
 }
 

@@ -49,6 +49,7 @@ describe("# User Services", () => {
       },
     };
     try {
+      //
       // public role
       let roleId = await updatePermissions(
         "public",
@@ -62,6 +63,7 @@ describe("# User Services", () => {
         action : "customroute"
       });
       expect(res.enabled).toBe(true);
+      //
       // authenticated role
       roleId = await updatePermissions(
         "authenticated",
