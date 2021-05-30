@@ -5,7 +5,12 @@
       "path": "/custom-route",
       "handler": "UsersPermissions.customRoute",
       "config": {
-        "policies": ["plugins::users-permissions.customPolicy"]
+        "policies": ["plugins::users-permissions.customPolicy"],
+        "description": "custom route",
+        "tag": {
+          "plugin": "users-permissions",
+          "name": "User"
+        }
       }
     },
     {

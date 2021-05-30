@@ -61,7 +61,7 @@ const testContext = {
   resData: {},
 };
 
-beforeAll(async (done) => {
+beforeAll(async () => {
   const res = await userhelper.createTestUsers(
     null,
     global.serverConfig.serverUrl
@@ -71,12 +71,10 @@ beforeAll(async (done) => {
   availableRoles["authenticated"].headers[
     "Authorization"
   ] = `Bearer ${testContext.testUsers["user1"].jwt}`;
-  done();
 });
 
-afterAll(async (done) => {
+afterAll(async () => {
   await userhelper.deleteTestUsers(global.serverConfig.serverUrl);
-  done();
 });
 
 for (const [routeName, routeObject] of Object.entries(targetRoutes)) {
@@ -104,9 +102,9 @@ for (const [routeName, routeObject] of Object.entries(targetRoutes)) {
           const permission = (test_data && test_data[`permission_${roleName}`]) || 403;
           const permissionStatus =
             Number.isInteger(permission) || permission === "skip" ? permission : permission.status;
-          it(`### ${handler}: ${method} ${route.path} should be ${permissionStatus}`, async (done) => {
+          it(`### ${handler}: ${method} ${route.path} should be ${permissionStatus}`, async () => {
             // skip permission check
-            if (permission === "skip") return done();
+            if (permission === "skip") return;
 
             // set test user. you shoud set the user HERE!
             requestContext.user = testContext.testUsers["user1"];
@@ -165,8 +163,6 @@ for (const [routeName, routeObject] of Object.entries(targetRoutes)) {
               requestContext[name] = res.body;
               //console.log("DATA SAVED", resData);
             }
-
-            done();
           });
         }
       }); // EO permission tests
