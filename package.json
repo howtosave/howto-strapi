@@ -44,12 +44,12 @@
     "strapi-utils": "*"
   },
   "devDependencies": {
-    "knex": "^0.20.0",
+    "knex": "0.21.18",
     "mysql": "^2.17.1",
     "pg": "^7.10.0",
     "sqlite3": "^4.0.6",
 
-    "jest": "~26.1.0",
+    "jest": "27.0.3",
     "supertest": "^4.0.2"
   },
   "strapi": {
