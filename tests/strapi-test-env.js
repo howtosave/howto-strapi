@@ -1,3 +1,7 @@
+/**
+ * Strapi Test Env
+ */
+
 //
 // load .env
 //
@@ -10,30 +14,28 @@ require("dotenv").config({
 });
 
 const NodeEnvironment = require("jest-environment-node");
-const { startStrapi, stopStrapi } = require("./_helpers/strapi");
+const { startStrapi } = require("./_helpers/strapi");
 
 class StrapiEnvironment extends NodeEnvironment {
   constructor(config, context) {
     super(config, context);
-    //this.testPath = context.testPath;
-    //this.docblockPragmas = context.docblockPragmas;
   }
 
   async setup() {
+    console.log("***************** test-env$setup(): 0");
     await super.setup();
+    console.log("***************** test-env$setup(): 1");
+
     // create global starpi
     this.global.strapi = await startStrapi();
   }
 
   async teardown() {
-    if (strapi["carbonKue"]) {
-      await strapi.carbonKue.close();
-    }
+    console.log("***************** test-env$teardown(): 0");
+    // do not call strapiStop()
+    // global.strapi is reused
     await super.teardown();
-  }
-
-  runScript(script) {
-    return super.runScript(script);
+    console.log("***************** test-env$teardown(): 1");
   }
 }
 

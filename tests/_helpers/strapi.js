@@ -5,6 +5,8 @@ var instance;
 
 async function startStrapi(start=false) {
   if (!instance) {
+    //console.log("*********************** startStrapi(): start new instance");
+
     /** 
      * The following code is copied from start() and listen()
      * in `./strapi/packages/strapi/lib/Strapi.js`.
@@ -31,9 +33,16 @@ async function startStrapi(start=false) {
 }
 
 async function stopStrapi() {
-  instance && await instance.server.close(() => {
-    process.exit();
-  });
+  const tmp = instance;
+  if (instance) {
+    instance = null;
+    if (tmp["carbonKue"]) {
+      await tmp["carbonKue"].close();
+    }
+    await tmp.server.close(() => {
+      console.log(">>> strapi's been destroyed");
+    });
+  }
 }
 
 module.exports = { 
