@@ -10,7 +10,12 @@ module.exports = {
   ],
   testPathIgnorePatterns: [
     "/node_modules/",
-    "/.tmp/","/tmp/",
+    "/packages/",
+    "/plugins/",
+    "/.tmp/",
+    "/tmp/",
+    "/noop/",
+    "/api/",
     "/.cache/",
     "/build/",
     "/strapi/",

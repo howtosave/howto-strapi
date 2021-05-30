@@ -1,13 +1,13 @@
 
-async function getRoles(type) {
+async function getRole(type) {
   return strapi
     .query("role", "users-permissions")
-    .find({type});
+    .findOne({type});
 }
 
 async function createUser(userInput) {
   if (userInput.role) {
-    const role = await getRoles(userInput.role);
+    const role = await getRole(userInput.role);
     if (!role) throw Error("Invalid role type: " + userInput.role);
     userInput.role = role.id;
   }
@@ -42,9 +42,38 @@ function getAuthToken(id) {
   return strapi.plugins["users-permissions"].services.jwt.issue({ id });
 }
 
+async function updatePermissions(role, permissionInput, type="application") {
+  /*
+    const permissions = {
+      application: {          // type
+        controllers: {
+          noop: {             // controller
+            index: {          // action
+              enabled: true   // 
+            }
+          }
+        }
+      }
+    };
+  */
+  const roleInst = await getRole(role);
+  const permissions = {
+    [type]: {
+      controllers: {
+        ...permissionInput
+      }
+    }
+  };
+
+  await strapi.plugins["users-permissions"]
+  .services.userspermissions.updateRole(roleInst.id, { permissions });
+  return roleInst.id;
+}
+
 module.exports = { 
   createUser,
   deleteUser,
   deleteAllUser,
   getAuthToken,
+  updatePermissions,
 };
