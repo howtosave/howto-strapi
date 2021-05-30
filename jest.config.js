@@ -20,10 +20,9 @@ module.exports = {
   globalSetup: './tests/global-setup.js',
   // A path to a module which exports an async function that is triggered once after all test suites
   globalTeardown: './tests/global-teardown.js',
-  // favor of setupFilesAfterEnv in jest 24
   // The test environment that will be used for testing
   testEnvironment: './tests/strapi-test-env.js',
-
+  // favor of setupFilesAfterEnv in jest 24
   setupFilesAfterEnv: ['./tests/setup-after-env.js'],
   globals: {
   },

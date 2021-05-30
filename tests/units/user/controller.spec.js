@@ -18,24 +18,21 @@ describe("# User -- users-permissions", () => {
   // user mock data
   let testUser;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     const user = await createUser(mockUserInput);
     const jwt = await getAuthToken(user.id);
     testUser = {
       user, jwt
     };
-    done();
   });
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     testUser && await deleteUser(testUser.user.id);
-    done();
   });
 
-  it("## should create test user", async (done) => {
+  it("## should create test user", async () => {
     const { user, jwt } = testUser;
     expect(user.username).toBe(mockUserInput.username);
-    expect(jwt).toBe('a');
-    done();
+    expect(jwt).toBeTruthy();
   });
 });
