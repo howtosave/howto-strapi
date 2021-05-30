@@ -88,6 +88,19 @@ index faf620fc0..15a0926ca 100644
  
      ctx.body = {
        data: {
+diff --git a/packages/strapi-admin/package.json b/packages/strapi-admin/package.json
+index 5c85f0b6b..ee1d51142 100644
+--- a/packages/strapi-admin/package.json
++++ b/packages/strapi-admin/package.json
+@@ -62,6 +62,8 @@
+     "immutable": "^3.8.2",
+     "invariant": "^2.2.4",
+     "is-wsl": "^2.0.0",
++    "jquery": "1.9.1",
++    "popper.js": "^1.16.1",
+     "js-cookie": "2.2.1",
+     "jsonwebtoken": "8.5.1",
+     "koa-compose": "4.1.0",
 diff --git a/packages/strapi-admin/services/metrics.js b/packages/strapi-admin/services/metrics.js
 index 22d6f7d28..5d7f0d267 100644
 --- a/packages/strapi-admin/services/metrics.js
@@ -178,6 +191,39 @@ index 27c1b3271..4fb87c6bf 100644
      default:
        return undefined;
    }
+diff --git a/packages/strapi-connector-mongoose/lib/index.js b/packages/strapi-connector-mongoose/lib/index.js
+index 634d03a56..b510707c9 100644
+--- a/packages/strapi-connector-mongoose/lib/index.js
++++ b/packages/strapi-connector-mongoose/lib/index.js
+@@ -38,11 +38,12 @@ const defaults = {
+ const isMongooseConnection = ({ connector }) => connector === 'mongoose';
+ 
+ const createConnectionURL = opts => {
+-  const { protocol, auth, host, port } = opts;
++  // [PK] fix mongo connection issue
++  const { protocol, auth, host, port, database } = opts;
+ 
+   return {
+     toString() {
+-      return `${protocol}://${auth}${host}${port}/`;
++      return `${protocol}://${auth}${host}${port}/${database}`;
+     },
+   };
+ };
+@@ -104,11 +105,13 @@ module.exports = function(strapi) {
+       connectOptions.useUnifiedTopology = useUnifiedTopology || true;
+ 
+       try {
++        // [PK] fix mongo connection issue
+         const connectionURL = createConnectionURL({
+           protocol: `mongodb${isSrv ? '+srv' : ''}`,
+           port: isSrv ? '' : `:${port}`,
+           host,
+           auth: username ? `${username}:${encodeURIComponent(password)}@` : '',
++          database,
+         });
+ 
+         const connectionString = uri || connectionURL.toString();
 diff --git a/packages/strapi-plugin-content-manager/controllers/collection-types.js b/packages/strapi-plugin-content-manager/controllers/collection-types.js
 index c5adadd6e..6f1debd5b 100644
 --- a/packages/strapi-plugin-content-manager/controllers/collection-types.js
