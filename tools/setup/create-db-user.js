@@ -73,10 +73,12 @@ function onChildProcessExit(child) {
   // create users
   try {
     const url = `mongodb://${ADMIN_USER}:${ADMIN_PASS}@${options.DB_HOST||'127.0.0.1'}:${options.DB_PORT||27017}/`;
+    // grant 'dbAdmin' role to test user, otherwise 'readWrite' role
+    const role = process.env.NODE_ENV === "test" ? "dbAdmin" : "readWrite";
     child = spawn('mongo', [
       url,
       '--eval', 
-      `db.getSiblingDB('${options.DB_NAME}').createUser({ user:'${options.DB_USER}', pwd: '${options.DB_PASS}', roles: [{ role:'readWrite', db:'${options.DB_NAME}' }] });`
+      `db.getSiblingDB('${options.DB_NAME}').createUser({ user:'${options.DB_USER}', pwd: '${options.DB_PASS}', roles: [{ role:'${role}', db:'${options.DB_NAME}' }] });`
     ], {
       //stdio: ['pipe', 'pipe', 'pipe'] // stdin, stdout, stderr
       stdio: [process.stdin, process.stdout, process.stderr]
@@ -90,5 +92,7 @@ function onChildProcessExit(child) {
       child.kill();
     }
   }
+  // update user role: db.grantRolesToUser(name, roles[]) See https://docs.mongodb.com/manual/reference/method/db.grantRolesToUser
+  // remove user: db.dropUser(name) See https://docs.mongodb.com/manual/reference/method/db.dropUser
 
 })({options});
