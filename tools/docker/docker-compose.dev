@@ -1,0 +1,73 @@
+version: "3.5"
+services:
+
+  webserver:
+    build:
+      context: ../nginx
+      dockerfile: dockerfile.development
+      args:
+        volume_ro: /volume-ro
+        volume_rw: /volume-rw
+    image: howto:nginx_d
+    ports: # local:remote
+      - "8080:80"
+    networks:
+      - backend-network
+    volumes:
+      - type: bind
+        source: ./wc-volume
+        target: /volume-ro
+        read_only: true
+      - type: bind
+        source: ./wc-volume
+        target: /volume-rw
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  webapp:
+    build:
+      context: ../nodejs/app
+      dockerfile: dockerfile.pm2-dev
+      args:
+        volume_ro: /volume-ro
+        volume_rw: /volume-rw
+        workdir: /workdir
+    image: howto:pm2-dev
+    environment:
+      - PORT=2337
+      - NODE_ENV=development
+    ports: # local:remote
+      - "2337:2337"
+    expose:
+      - 2337
+    networks:
+      - backend-network
+    volumes:
+      - type: bind
+        source: ./wc-volume/public
+        target: /volume-ro/public
+        read_only: true
+      - type: bind
+        source: ./wc-volume/upload
+        target: /volume-rw/upload
+      - type: bind
+        source: ../nodejs/app
+        target: /workdir
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  backend-network:
+    external:
+      name: backend-network
+

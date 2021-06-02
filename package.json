@@ -9,6 +9,8 @@
     "start:dev": "NODE_ENV=development node server.js",
     "build:ui": "strapi build --clean",
     "deploy:local": "./tools/deploy.sh svc00@127.0.0.1 -e dev",
+    "build:docker:nginx": "./tools/docker/nginx/docker-build.sh",
+    "build:docker:pm2": "./tools/docker/pm2/docker-build.sh",
     "test": "jest --config ./jest.config.js --forceExit --detectOpenHandles",
     "test:unit": "jest --config ./jest.config.js --forceExit --detectOpenHandles ./tests/units/*",
     "test:e2e": "TARGET_SERVER=internal jest --config ./jest.e2e.config.js --forceExit --detectOpenHandles ./tests/e2e/*",

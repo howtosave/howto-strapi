@@ -1,0 +1,73 @@
+version: "3.5"
+services:
+
+  webserver:
+    build:
+      context: ../nginx
+      dockerfile: dockerfile
+      args:
+        volume_ro: /volume-ro
+        volume_rw: /volume-rw
+    image: howto:nginx
+    ports: # local:remote
+      - "8080:80"
+    networks:
+      - backend-network
+    volumes:
+      - type: volume
+        source: example_web_cluster_volume
+        target: /volume-ro
+        read_only: true
+      - type: volume
+        source: example_web_cluster_volume
+        target: /volume-rw
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  webapp:
+    build:
+      context: ../nodejs/app
+      dockerfile: dockerfile.pm2
+      args:
+        volume_ro: /volume-ro
+        volume_rw: /volume-rw
+    image: howto:pm2
+    environment:
+      - PORT=2337
+      - NODE_ENV=production
+    ports: # local:remote
+      - "2337:2337"
+    expose:
+      - 2337
+    networks:
+      - backend-network
+    volumes:
+      - type: volume
+        source: example_web_cluster_volume
+        target: /volume-ro
+        read_only: true
+      - type: volume
+        source: example_web_cluster_volume
+        target: /volume-rw
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  backend-network:
+    external:
+      name: backend-network
+
+volumes:
+  example_web_cluster_volume:
+    external:
+      name: example_web_cluster_volume

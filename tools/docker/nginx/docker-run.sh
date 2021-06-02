@@ -24,8 +24,19 @@ else
   echo
   echo ">>> Run image in development mode. local port: $LOCAL_PORT"
   echo
+  # check network
+  docker network inspect br10 > /dev/null
+  if [ "$?" != "0" ]; then
+    # create network
+    docker network create \
+      --driver=bridge \
+      --subnet=10.0.0.0/8 \
+      --ip-range=10.255.255.255/8 \
+      --gateway=10.0.0.1 \
+      br10
+  fi
   # run with temp container
-  docker run --rm -it --name nginx-dev -p $LOCAL_PORT:80 \
+  docker run --rm -it --network br10 --ip 10.0.0.3 --name nginx-dev -p $LOCAL_PORT:80 \
     --mount type=bind,source="$ROOTDIR",target=/volume-ro,readonly \
     --mount type=bind,source="$ROOTDIR",target=/volume-rw \
     howto:nginx_dev
