@@ -22,7 +22,7 @@
     "docker:run": "./tools/docker/mongo/run.sh --detach",
     "build:docker:nginx": "./tools/docker/nginx/docker-build.sh",
     "build:docker:pm2": "./tools/docker/pm2/docker-build.sh",
-    "db:init:dev": "node tools/setup/create-db-user.js"
+    "init:db:dev": "NODE_ENV=development node tools/mongo/create-db-user.js"
   },
   "dependencies": {
     "lodash": "^4.17.5",

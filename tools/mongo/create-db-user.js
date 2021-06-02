@@ -24,11 +24,11 @@ const ADMIN_USER='myroot';
 const ADMIN_PASS='myroot000';
 
 const options = {
-  DB_HOST: process.env.DB_HOST,
-  DB_PORT: process.env.DB_PORT,
-  DB_NAME: process.env.DB_NAME,
-  DB_USER: process.env.DB_USER,
-  DB_PASS: process.env.DB_PASS,
+  DB_HOST: process.env.DATABASE_HOST,
+  DB_PORT: process.env.DATABASE_PORT,
+  DB_NAME: process.env.DATABASE_NAME,
+  DB_USER: process.env.DATABASE_USERNAME,
+  DB_PASS: process.env.DATABASE_PASSWORD,
 };
 
 function onChildProcessExit(child) {
