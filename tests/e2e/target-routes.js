@@ -5,7 +5,7 @@ const users_permissions = {
     "POST_/auth/local": {
       permission_public: "skip",
     },
-    "GET_/users/custom": {
+    "GET_/custom-route": {
       permission_public: 403,
     },
     "PUT_/users/:id": {
@@ -20,19 +20,11 @@ const users_permissions = {
   },
 };
 
-const noop = {
-  routes: require("../../api/noop/config/routes").routes,
-};
-
-const address = {
-  routes: require("../../api/address/config/routes").routes,
-};
-
 //
 // routes to be tested
 //
 module.exports = {
   users_permissions,
   //noop,
-  address,
+  //address,
 };

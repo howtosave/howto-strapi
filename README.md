@@ -1,85 +1,56 @@
-# getstarted
+# strapi fork for CARBON
 
-This is an example app you can run to test your changes quickly.
+## Merge sequence
 
-## Requirements
+### merge strapi
 
-- Docker
-- Docker compose
-- Node
+```sh
+# go to strapi submodule directory
+cd strapi
 
-## Installation
+# add original strapi repository if necessary
+git remote add strapi https://github.com/strapi/strapi.git
 
-By default once you have setup the monorepo you will be able to run the getstarted app with a sqlite DB directly.
+# checkout base version
+git checkout my3.6.1
 
-If you wish to run the getstarted app with another database you can use the `docker-compose.dev.yml` file at the root of the directory.
+# create a branch for new version
+git checkout -b my3.6.2
 
-### start the databases
+# *fetch* (not pull) the new version from remote strapi
+git fetch strapi v3.6.2
 
-Run the following command at the root of the monorepo
+# merge with the fetched version
+git merge FETCH_HEAD
 
-```
-docker-compose -f docker-compose.dev.yml up -d
-```
+# resolve conflicts and commits
 
-If you need to stop the running databases you can stop them with the following command:
+# !!! N.B. !!!
+# build strapi-helper-plugin
+cd packages/strapi-helper-plugin
+yarn build
 
-```
-docker-compose -f docker-compose.dev.yml stop
-```
-
-### run the getstarted app with a specific database
-
-```
-DB={dbName} yarn develop
-```
-
-The way it works is that the `getstarted` app has a specific `database.js` config file that will use the `DB` environment variable to setup the right database connection. You can look at the code [here](./config/database.js)
-
-**Warning**
-
-You might have some errors while connecting to the databases.
-They might be coming from a conflict between a locally running database instance and the docker instance. To avoid the errors either shutdown your local database instance or change the ports in the `./config/database.js` and the `docker-compose.dev.yml` file.
-
-**Example**:
-
-`database.js`
-
-```js
-const mongo = {
-  connector: 'mongoose',
-  settings: {
-    database: 'strapi',
-    username: 'root',
-    password: 'strapi',
-    port: 27099,
-    host: 'localhost',
-  },
-  options: {},
-};
-
-// other connections...
-
-module.exports = {
-  defaultConnection: 'default',
-  connections: {
-    default: mongo,
-  },
-};
+# gen diff
+bash tools/diff/gen-strapi-diff.sh v3.6.1
 ```
 
-`docker-compose.dev.yml`
+### merge example
 
-```yml
-services:
-  mongo:
-    # image: mongo
-    # restart: always
-    # environment:
-    #   MONGO_INITDB_ROOT_USERNAME: root
-    #   MONGO_INITDB_ROOT_PASSWORD: strapi
-    # volumes:
-    #   - mongodata:/data/db
-    ports:
-      - '27099:27017'
+```sh
+# check diff briefly
+diff -qrZ --exclude documentation -x .git -x strapi -x exports -x node_modules -x build -x .cache -x .tmp -x .env -x packages -x tools ./ ./strapi/examples/getstarted
+
+# do merging work with emacs
+emacs --eval '(ediff-directories "./" "./strapi/examples/getstarted/" ".*")'
+```
+
+## Tools
+
+### Initial setup
+
+#### Database
+
+```sh
+# create database and users
+node tools/setup/mongodb.js
 ```

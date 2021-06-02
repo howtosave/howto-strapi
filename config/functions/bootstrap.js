@@ -6,9 +6,6 @@
  *
  * This gives you an opportunity to set up your data model,
  * run jobs, or perform some special logic.
- *
- * # documentation
- * https://strapi.io/documentation/v3.x/concepts/configurations.html#bootstrap
  */
 
 module.exports = () => {};

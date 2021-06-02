@@ -8,9 +8,9 @@
  * Secure link secret
  * nginx config file(location.conf)에 명시된 secret와 동일해야 한다.
  */
-const DEFAULT_SECURE_LINK_SECRET = "0sEcUrElInK0";
-
 const crypto = require("crypto");
+ 
+const DEFAULT_SECURE_LINK_SECRET = "0sEcUrElInK0";
 
 function generateSecurePathHash(url, client_ip, expires, secret) {
   if (!url) {

@@ -19,8 +19,17 @@ require("dotenv").config({
 });
 
 const { spawn } = require('child_process');
+
 const ADMIN_USER='myroot';
-const ADMIN_PASS='root000';
+const ADMIN_PASS='myroot000';
+
+const options = {
+  DB_HOST: process.env.DB_HOST,
+  DB_PORT: process.env.DB_PORT,
+  DB_NAME: process.env.DB_NAME,
+  DB_USER: process.env.DB_USER,
+  DB_PASS: process.env.DB_PASS,
+};
 
 function onChildProcessExit(child) {
   return new Promise((resolve, reject) => {
@@ -35,12 +44,13 @@ function onChildProcessExit(child) {
   });
 }
 
-( async ({env}) => {
+( async ({options}) => {
   let child;
 
   // connection test
   try {
-    const url = `mongodb://${env.DATABASE_USERNAME}:${env.DATABASE_PASSWORD}@${env.DATABASE_HOST||'127.0.0.1'}:${env.DATABASE_PORT||27017}/${env.DATABASE_NAME}`;
+    // try to connect with the user
+    const url = `mongodb://${options.DB_USER}:${options.DB_PASS}@${options.DB_HOST||'127.0.0.1'}:${options.DB_PORT||27017}/${options.DB_NAME}`;
     console.log(">>> connection url:", url);
     child = spawn('mongo', [
       url,
@@ -49,6 +59,7 @@ function onChildProcessExit(child) {
       stdio: [process.stdin, process.stdout, process.stderr]
     });
     await onChildProcessExit(child);
+    // done
     return;
   } catch (e) {
     console.error(e.message);
@@ -58,13 +69,16 @@ function onChildProcessExit(child) {
       child.kill();
     }
   }
-
+  // failed to connect to the database
   // create users
   try {
-    const url = `mongodb://${ADMIN_USER}:${ADMIN_PASS}@${env.DATABASE_HOST||'127.0.0.1'}:${env.DATABASE_PORT||27017}/`;
+    const url = `mongodb://${ADMIN_USER}:${ADMIN_PASS}@${options.DB_HOST||'127.0.0.1'}:${options.DB_PORT||27017}/`;
+    // grant 'dbAdmin' role to test user, otherwise 'readWrite' role
+    const role = process.env.NODE_ENV === "test" ? "dbAdmin" : "readWrite";
     child = spawn('mongo', [
       url,
-      '--eval', `db.getSiblingDB('${env.DATABASE_NAME}').createUser({ user:'${env.DATABASE_USERNAME}', pwd: '${env.DATABASE_PASSWORD}', roles: [{ role:'readWrite', db:'${env.DATABASE_NAME}' }] });`
+      '--eval', 
+      `db.getSiblingDB('${options.DB_NAME}').createUser({ user:'${options.DB_USER}', pwd: '${options.DB_PASS}', roles: [{ role:'${role}', db:'${options.DB_NAME}' }] });`
     ], {
       //stdio: ['pipe', 'pipe', 'pipe'] // stdin, stdout, stderr
       stdio: [process.stdin, process.stdout, process.stderr]
@@ -78,5 +92,7 @@ function onChildProcessExit(child) {
       child.kill();
     }
   }
+  // update user role: db.grantRolesToUser(name, roles[]) See https://docs.mongodb.com/manual/reference/method/db.grantRolesToUser
+  // remove user: db.dropUser(name) See https://docs.mongodb.com/manual/reference/method/db.dropUser
 
-})({env:process.env});
+})({options});

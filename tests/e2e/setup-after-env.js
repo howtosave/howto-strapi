@@ -1,3 +1,3 @@
-// jest.setup.js
+// setup-after-env.js
 
 jest.setTimeout(30000);

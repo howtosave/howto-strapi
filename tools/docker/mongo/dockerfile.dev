@@ -1,0 +1,22 @@
+#
+# MongoDB for Dev purpose
+#
+
+# See https://hub.docker.com/_/mongo
+# FROM mongo:4.4.3-bionic
+FROM mongo:3.6.23-xenial
+
+ARG etc_mongo=/etc/mongo
+ARG var_mongo=/var/mongo
+
+RUN echo "ARGs: etc_mongo: ${etc_mongo}, var_mongo: ${var_mongo}"
+
+ENV MONGO_INITDB_ROOT_USERNAME "myroot"
+ENV MONGO_INITDB_ROOT_PASSWORD "myroot00"
+
+ENV MONGO_DIR "${etc_mongo}"
+# volumes to be bound at runtime
+VOLUME [ "${etc_mongo}", "${var_mongo}" ]
+
+# binding ip for connection
+ENTRYPOINT mongod --bind_ip 0.0.0.0 --port 27017

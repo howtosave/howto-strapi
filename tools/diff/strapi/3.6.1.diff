@@ -1,0 +1,1195 @@
+diff --git a/.gitattributes b/.gitattributes
+index a29125a8e..533a2cf19 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -104,3 +104,4 @@ AUTHORS text
+ *.woff binary
+ *.pyc binary
+ *.pdf binary
++*.min.js binary
+diff --git a/packages/strapi-admin/admin/src/containers/App/index.js b/packages/strapi-admin/admin/src/containers/App/index.js
+index 37c5bd381..64a2be146 100644
+--- a/packages/strapi-admin/admin/src/containers/App/index.js
++++ b/packages/strapi-admin/admin/src/containers/App/index.js
+@@ -79,23 +79,8 @@ function App(props) {
+         const { uuid } = data;
+ 
+         if (uuid) {
+-          try {
+-            const deviceId = await getUID();
+-
+-            fetch('https://analytics.strapi.io/track', {
+-              method: 'POST',
+-              body: JSON.stringify({
+-                event: 'didInitializeAdministration',
+-                uuid,
+-                deviceId,
+-              }),
+-              headers: {
+-                'Content-Type': 'application/json',
+-              },
+-            });
+-          } catch (e) {
+-            // Silent.
+-          }
++          // [PK] removed useless code
++          data.deviceId = await getUID();
+         }
+ 
+         getDataRef.current(data);
+diff --git a/packages/strapi-admin/admin/src/containers/Onboarding/index.js b/packages/strapi-admin/admin/src/containers/Onboarding/index.js
+index 25cc59b21..0c9642fd2 100644
+--- a/packages/strapi-admin/admin/src/containers/Onboarding/index.js
++++ b/packages/strapi-admin/admin/src/containers/Onboarding/index.js
+@@ -19,29 +19,10 @@ const OnboardingVideos = () => {
+   const [reducerState, dispatch] = useReducer(reducer, initialState, init);
+   const { isLoading, isOpen, videos } = reducerState.toJS();
+ 
+-  useEffect(() => {
+-    const getData = async () => {
+-      try {
+-        const { data } = await axios.get('https://strapi.io/videos', {
+-          timeout: 1000,
+-        });
+-        const { didWatchVideos, videos } = formatVideoArray(data);
+-
+-        dispatch({
+-          type: 'GET_DATA_SUCCEEDED',
+-          didWatchVideos,
+-          videos,
+-        });
+-      } catch (err) {
+-        console.error(err);
+-        dispatch({
+-          type: 'HIDE_VIDEO_ONBOARDING',
+-        });
+-      }
+-    };
+-
+-    getData();
+-  }, []);
++  // [PK] removed useless code
++  dispatch({
++    type: 'HIDE_VIDEO_ONBOARDING',
++  });
+ 
+   // Hide the player in case of request error
+   if (isLoading) {
+diff --git a/packages/strapi-admin/controllers/authentication.js b/packages/strapi-admin/controllers/authentication.js
+index faf620fc0..15a0926ca 100644
+--- a/packages/strapi-admin/controllers/authentication.js
++++ b/packages/strapi-admin/controllers/authentication.js
+@@ -136,7 +136,7 @@ module.exports = {
+       roles: superAdminRole ? [superAdminRole.id] : [],
+     });
+ 
+-    await strapi.telemetry.send('didCreateFirstAdmin');
++    // [PK] remove telemetry
+ 
+     ctx.body = {
+       data: {
+diff --git a/packages/strapi-admin/package.json b/packages/strapi-admin/package.json
+index 5c85f0b6b..ee1d51142 100644
+--- a/packages/strapi-admin/package.json
++++ b/packages/strapi-admin/package.json
+@@ -62,6 +62,8 @@
+     "immutable": "^3.8.2",
+     "invariant": "^2.2.4",
+     "is-wsl": "^2.0.0",
++    "jquery": "1.9.1",
++    "popper.js": "^1.16.1",
+     "js-cookie": "2.2.1",
+     "jsonwebtoken": "8.5.1",
+     "koa-compose": "4.1.0",
+diff --git a/packages/strapi-admin/services/metrics.js b/packages/strapi-admin/services/metrics.js
+index 22d6f7d28..5d7f0d267 100644
+--- a/packages/strapi-admin/services/metrics.js
++++ b/packages/strapi-admin/services/metrics.js
+@@ -1,13 +1,11 @@
+ 'use strict';
+ 
+ const sendDidInviteUser = async () => {
+-  const numberOfUsers = await strapi.admin.services.user.count();
+-  const numberOfRoles = await strapi.admin.services.role.count();
+-  return strapi.telemetry.send('didInviteUser', { numberOfRoles, numberOfUsers });
++  // [PK] remove telemetry
+ };
+ 
+ const sendDidUpdateRolePermissions = async () => {
+-  return strapi.telemetry.send('didUpdateRolePermissions');
++  // [PK] remove telemetry
+ };
+ 
+ module.exports = {
+diff --git a/packages/strapi-admin/services/role.js b/packages/strapi-admin/services/role.js
+index f85e0637a..c5b1a922c 100644
+--- a/packages/strapi-admin/services/role.js
++++ b/packages/strapi-admin/services/role.js
+@@ -337,8 +337,7 @@ const assignPermissions = async (roleId, permissions = []) => {
+     throw strapi.errors.badRequest('ValidationError', err);
+   }
+ 
+-  const superAdmin = await getService('role').getSuperAdmin();
+-  const isSuperAdmin = superAdmin && superAdmin.id === roleId;
++  // [PK] remove telemetry
+   const assignRole = set('role', roleId);
+ 
+   const permissionsWithRole = permissions
+@@ -373,9 +372,7 @@ const assignPermissions = async (roleId, permissions = []) => {
+     permissionsToReturn.push(...createdPermissions.map(p => ({ ...p, role: p.role.id })));
+   }
+ 
+-  if (!isSuperAdmin && (permissionsToAdd.length || permissionsToDelete.length)) {
+-    await getService('metrics').sendDidUpdateRolePermissions();
+-  }
++  // [PK] remove telemetry
+ 
+   return permissionsToReturn;
+ };
+diff --git a/packages/strapi-admin/services/user.js b/packages/strapi-admin/services/user.js
+index 20e86226f..44b822f5a 100644
+--- a/packages/strapi-admin/services/user.js
++++ b/packages/strapi-admin/services/user.js
+@@ -37,7 +37,7 @@ const create = async attributes => {
+   const user = createUser(userInfo);
+   const createdUser = await strapi.query('user', 'admin').create(user);
+ 
+-  await strapi.admin.services.metrics.sendDidInviteUser();
++  // [PK] remove telemetry
+ 
+   return createdUser;
+ };
+diff --git a/packages/strapi-connector-mongoose/lib/buildQuery.js b/packages/strapi-connector-mongoose/lib/buildQuery.js
+index 379206b4b..f475d8db7 100644
+--- a/packages/strapi-connector-mongoose/lib/buildQuery.js
++++ b/packages/strapi-connector-mongoose/lib/buildQuery.js
+@@ -245,6 +245,11 @@ const applyQueryParams = ({ model, query, filters }) => {
+     query = query.limit(filters.limit);
+   }
+ 
++  // [PK] Apply select param
++  if (_.has(filters, 'select') && filters.select.length > 0) {
++    query = query.select(filters.select.join(' '));
++  }
++  
+   // Apply publication state param
+   if (_.has(filters, 'publicationState')) {
+     const populateQuery = populateQueries.publicationState[filters.publicationState];
+diff --git a/packages/strapi-connector-mongoose/lib/get-query-params.js b/packages/strapi-connector-mongoose/lib/get-query-params.js
+index 27c1b3271..4fb87c6bf 100644
+--- a/packages/strapi-connector-mongoose/lib/get-query-params.js
++++ b/packages/strapi-connector-mongoose/lib/get-query-params.js
+@@ -66,6 +66,11 @@ module.exports = (value, type, key) => {
+       result.key = `where.${key}.$nin`;
+       result.value = _.castArray(value);
+       break;
++    // [PK] add _select for query projection
++    case '_select':
++      result.key = 'select';
++      result.value = value ? value.split(',') : [];
++      break;
+     default:
+       return undefined;
+   }
+diff --git a/packages/strapi-connector-mongoose/lib/index.js b/packages/strapi-connector-mongoose/lib/index.js
+index 634d03a56..b510707c9 100644
+--- a/packages/strapi-connector-mongoose/lib/index.js
++++ b/packages/strapi-connector-mongoose/lib/index.js
+@@ -38,11 +38,12 @@ const defaults = {
+ const isMongooseConnection = ({ connector }) => connector === 'mongoose';
+ 
+ const createConnectionURL = opts => {
+-  const { protocol, auth, host, port } = opts;
++  // [PK] fix mongo connection issue
++  const { protocol, auth, host, port, database } = opts;
+ 
+   return {
+     toString() {
+-      return `${protocol}://${auth}${host}${port}/`;
++      return `${protocol}://${auth}${host}${port}/${database}`;
+     },
+   };
+ };
+@@ -104,11 +105,13 @@ module.exports = function(strapi) {
+       connectOptions.useUnifiedTopology = useUnifiedTopology || true;
+ 
+       try {
++        // [PK] fix mongo connection issue
+         const connectionURL = createConnectionURL({
+           protocol: `mongodb${isSrv ? '+srv' : ''}`,
+           port: isSrv ? '' : `:${port}`,
+           host,
+           auth: username ? `${username}:${encodeURIComponent(password)}@` : '',
++          database,
+         });
+ 
+         const connectionString = uri || connectionURL.toString();
+diff --git a/packages/strapi-plugin-content-manager/controllers/collection-types.js b/packages/strapi-plugin-content-manager/controllers/collection-types.js
+index c5adadd6e..6f1debd5b 100644
+--- a/packages/strapi-plugin-content-manager/controllers/collection-types.js
++++ b/packages/strapi-plugin-content-manager/controllers/collection-types.js
+@@ -78,7 +78,7 @@ module.exports = {
+       const entity = await entityManager.create(sanitizeFn(body), model);
+       ctx.body = permissionChecker.sanitizeOutput(entity);
+ 
+-      await strapi.telemetry.send('didCreateFirstContentTypeEntry', { model });
++      // [PK] remove telemetry
+     })();
+   },
+ 
+diff --git a/packages/strapi-plugin-content-manager/controllers/content-types.js b/packages/strapi-plugin-content-manager/controllers/content-types.js
+index f7675cd69..5b22ffc04 100644
+--- a/packages/strapi-plugin-content-manager/controllers/content-types.js
++++ b/packages/strapi-plugin-content-manager/controllers/content-types.js
+@@ -77,7 +77,7 @@ module.exports = {
+     const { body } = ctx.request;
+ 
+     const contentTypeService = getService('content-types');
+-    const metricsService = getService('metrics');
++    // [PK] remove telemetry
+ 
+     const contentType = await contentTypeService.findContentType(uid);
+ 
+@@ -105,7 +105,7 @@ module.exports = {
+ 
+     const newConfiguration = await contentTypeService.updateConfiguration(contentType, input);
+ 
+-    await metricsService.sendDidConfigureListView(contentType, newConfiguration);
++    // [PK] remove telemetry
+ 
+     ctx.body = { data: newConfiguration };
+   },
+diff --git a/packages/strapi-plugin-content-manager/controllers/single-types.js b/packages/strapi-plugin-content-manager/controllers/single-types.js
+index 6592b8999..01d8b7714 100644
+--- a/packages/strapi-plugin-content-manager/controllers/single-types.js
++++ b/packages/strapi-plugin-content-manager/controllers/single-types.js
+@@ -74,7 +74,7 @@ module.exports = {
+         const newEntity = await entityManager.create(sanitizeFn(body), model, { params: query });
+         ctx.body = permissionChecker.sanitizeOutput(newEntity);
+ 
+-        await strapi.telemetry.send('didCreateFirstContentTypeEntry', { model });
++        // [PK] remove telemetry
+         return;
+       }
+ 
+diff --git a/packages/strapi-plugin-content-manager/services/metrics.js b/packages/strapi-plugin-content-manager/services/metrics.js
+index bdae62287..524a98bc9 100644
+--- a/packages/strapi-plugin-content-manager/services/metrics.js
++++ b/packages/strapi-plugin-content-manager/services/metrics.js
+@@ -21,7 +21,7 @@ const sendDidConfigureListView = async (contentType, configuration) => {
+   }
+ 
+   try {
+-    await strapi.telemetry.send('didConfigureListView', data);
++    // [PK] remove telemetry
+   } catch (e) {
+     // silence
+   }
+diff --git a/packages/strapi-plugin-content-type-builder/controllers/ContentTypes.js b/packages/strapi-plugin-content-type-builder/controllers/ContentTypes.js
+index ff72d5799..834480fe4 100644
+--- a/packages/strapi-plugin-content-type-builder/controllers/ContentTypes.js
++++ b/packages/strapi-plugin-content-type-builder/controllers/ContentTypes.js
+@@ -2,7 +2,7 @@
+ 
+ const _ = require('lodash');
+ 
+-const { hasDraftAndPublish } = require('strapi-utils').contentTypes;
++// [PK] remove telemetry
+ 
+ const {
+   validateContentTypeInput,
+@@ -64,23 +64,14 @@ module.exports = {
+         components: body.components,
+       });
+ 
+-      const metricsProperties = {
+-        kind: contentType.kind,
+-        hasDraftAndPublish: hasDraftAndPublish(contentType.schema),
+-      };
+-
+-      if (_.isEmpty(strapi.api)) {
+-        await strapi.telemetry.send('didCreateFirstContentType', metricsProperties);
+-      } else {
+-        await strapi.telemetry.send('didCreateContentType', metricsProperties);
+-      }
++      // [PK] remove telemetry
+ 
+       setImmediate(() => strapi.reload());
+ 
+       ctx.send({ data: { uid: contentType.uid } }, 201);
+     } catch (error) {
+       strapi.log.error(error);
+-      await strapi.telemetry.send('didNotCreateContentType', { error: error.message });
++      // [PK] remove telemetry
+       ctx.send({ error: error.message }, 400);
+     }
+   },
+diff --git a/packages/strapi-plugin-content-type-builder/services/schema-builder/component-builder.js b/packages/strapi-plugin-content-type-builder/services/schema-builder/component-builder.js
+index 58d698703..81a394397 100644
+--- a/packages/strapi-plugin-content-type-builder/services/schema-builder/component-builder.js
++++ b/packages/strapi-plugin-content-type-builder/services/schema-builder/component-builder.js
+@@ -55,11 +55,7 @@ module.exports = function createComponentBuilder() {
+         .set('pluginOptions', infos.pluginOptions)
+         .setAttributes(this.convertAttributes(infos.attributes));
+ 
+-      if (this.components.size === 0) {
+-        strapi.telemetry.send('didCreateFirstComponent');
+-      } else {
+-        strapi.telemetry.send('didCreateComponent');
+-      }
++      // [PK] remove telemetry
+ 
+       this.components.set(uid, handler);
+ 
+diff --git a/packages/strapi-plugin-documentation/public/login.html b/packages/strapi-plugin-documentation/public/login.html
+index ccd28ad46..57dc0c14f 100755
+--- a/packages/strapi-plugin-documentation/public/login.html
++++ b/packages/strapi-plugin-documentation/public/login.html
+@@ -118,7 +118,7 @@
+           <div class="container">
+             <div class="row">
+               <div class="col-lg-6 col-lg-offset-3 col-md-12">
+-                <img alt="Strapi logo" class="logo" src="https://strapi.io/assets/images/logo_login.png">
++                <img alt="Strapi logo" class="logo" src="/assets/images/logo_login.png">
+                 <h2 class="sub-title">Enter the password to access the documentation.</h2>
+                 <form method="post" action="<%=actionUrl%>">
+                   <span class="error">Wrong password...</span>
+diff --git a/packages/strapi-plugin-i18n/config/functions/bootstrap.js b/packages/strapi-plugin-i18n/config/functions/bootstrap.js
+index 9be4f2e7e..539582dc1 100644
+--- a/packages/strapi-plugin-i18n/config/functions/bootstrap.js
++++ b/packages/strapi-plugin-i18n/config/functions/bootstrap.js
+@@ -3,7 +3,7 @@
+ const { getService } = require('../../utils');
+ 
+ module.exports = async () => {
+-  const { sendDidInitializeEvent } = getService('metrics');
++  // [PK] remove telemetry
+   const { decorator } = getService('entity-service-decorator');
+   const { initDefaultLocale } = getService('locales');
+   const { sectionsBuilder, actions, conditions, engine } = getService('permissions');
+@@ -31,7 +31,7 @@ module.exports = async () => {
+   // Hooks & Models
+   registerModelsHooks();
+ 
+-  sendDidInitializeEvent();
++  // [PK] remove telemetry
+ };
+ 
+ const registerModelsHooks = () => {
+diff --git a/packages/strapi-plugin-i18n/services/locales.js b/packages/strapi-plugin-i18n/services/locales.js
+index b6e02191f..5a7708db7 100644
+--- a/packages/strapi-plugin-i18n/services/locales.js
++++ b/packages/strapi-plugin-i18n/services/locales.js
+@@ -17,7 +17,7 @@ const count = params => strapi.query('locale', 'i18n').count(params);
+ const create = async locale => {
+   const result = await strapi.query('locale', 'i18n').create(locale);
+ 
+-  getService('metrics').sendDidUpdateI18nLocalesEvent();
++  // [PK] remove telemetry
+ 
+   return result;
+ };
+@@ -25,7 +25,7 @@ const create = async locale => {
+ const update = async (params, updates) => {
+   const result = await strapi.query('locale', 'i18n').update(params, updates);
+ 
+-  getService('metrics').sendDidUpdateI18nLocalesEvent();
++  // [PK] remove telemetry
+ 
+   return result;
+ };
+@@ -37,7 +37,7 @@ const deleteFn = async ({ id }) => {
+     await deleteAllLocalizedEntriesFor({ locale: localeToDelete.code });
+     const result = await strapi.query('locale', 'i18n').delete({ id });
+ 
+-    getService('metrics').sendDidUpdateI18nLocalesEvent();
++    // [PK] remove telemetry
+ 
+     return result;
+   }
+diff --git a/packages/strapi-plugin-i18n/services/metrics.js b/packages/strapi-plugin-i18n/services/metrics.js
+index f10443d56..ea2e72f50 100644
+--- a/packages/strapi-plugin-i18n/services/metrics.js
++++ b/packages/strapi-plugin-i18n/services/metrics.js
+@@ -1,23 +1,13 @@
+ 'use strict';
+ 
+-const { reduce } = require('lodash/fp');
+-const { getService } = require('../utils');
++// [PK] remove telemetry
+ 
+ const sendDidInitializeEvent = async () => {
+-  const { isLocalizedContentType } = getService('content-types');
+-
+-  const numberOfContentTypes = reduce(
+-    (sum, contentType) => (isLocalizedContentType(contentType) ? sum + 1 : sum),
+-    0
+-  )(strapi.contentTypes);
+-
+-  await strapi.telemetry.send('didInitializeI18n', { numberOfContentTypes });
++  // [PK] remove telemetry
+ };
+ 
+ const sendDidUpdateI18nLocalesEvent = async () => {
+-  const numberOfLocales = await getService('locales').count();
+-
+-  await strapi.telemetry.send('didUpdateI18nLocales', { numberOfLocales });
++  // [PK] remove telemetry
+ };
+ 
+ module.exports = {
+diff --git a/packages/strapi-plugin-upload/middlewares/upload/index.js b/packages/strapi-plugin-upload/middlewares/upload/index.js
+index d37aa9191..73756a2b6 100644
+--- a/packages/strapi-plugin-upload/middlewares/upload/index.js
++++ b/packages/strapi-plugin-upload/middlewares/upload/index.js
+@@ -7,10 +7,9 @@ const _ = require('lodash');
+ 
+ module.exports = strapi => ({
+   initialize() {
+-    const configPublicPath = strapi.config.get(
+-      'middleware.settings.public.path',
+-      strapi.config.paths.static
+-    );
++    // [PK] fix overring upload directory issue
++    const configPublicPath = strapi.config.paths.static || strapi.config.middleware.settings.public.path;
++
+     const staticDir = resolve(strapi.dir, configPublicPath);
+ 
+     strapi.app.on('error', err => {
+diff --git a/packages/strapi-plugin-upload/services/Upload.js b/packages/strapi-plugin-upload/services/Upload.js
+index c4e7bc15a..410068077 100644
+--- a/packages/strapi-plugin-upload/services/Upload.js
++++ b/packages/strapi-plugin-upload/services/Upload.js
+@@ -32,15 +32,7 @@ const generateFileName = name => {
+   return `${baseName}_${randomSuffix()}`;
+ };
+ 
+-const sendMediaMetrics = data => {
+-  if (_.has(data, 'caption') && !_.isEmpty(data.caption)) {
+-    strapi.telemetry.send('didSaveMediaWithCaption');
+-  }
+-
+-  if (_.has(data, 'alternativeText') && !_.isEmpty(data.alternativeText)) {
+-    strapi.telemetry.send('didSaveMediaWithAlternativeText');
+-  }
+-};
++// [PK] remove telemetry
+ 
+ const combineFilters = params => {
+   // FIXME: until we support boolean operators for querying we need to make mime_ncontains use AND instead of OR
+@@ -283,7 +275,7 @@ module.exports = {
+     if (user) {
+       fileValues[UPDATED_BY_ATTRIBUTE] = user.id;
+     }
+-    sendMediaMetrics(fileValues);
++    // [PK] remove telemetry
+ 
+     const res = await strapi.query('file', 'upload').update(params, fileValues);
+     const modelDef = strapi.getModel('file', 'upload');
+@@ -297,7 +289,7 @@ module.exports = {
+       fileValues[UPDATED_BY_ATTRIBUTE] = user.id;
+       fileValues[CREATED_BY_ATTRIBUTE] = user.id;
+     }
+-    sendMediaMetrics(fileValues);
++    // [PK] remove telemetry
+ 
+     const res = await strapi.query('file', 'upload').create(fileValues);
+     const modelDef = strapi.getModel('file', 'upload');
+@@ -386,11 +378,7 @@ module.exports = {
+   },
+ 
+   setSettings(value) {
+-    if (value.responsiveDimensions === true) {
+-      strapi.telemetry.send('didEnableResponsiveDimensions');
+-    } else {
+-      strapi.telemetry.send('didDisableResponsiveDimensions');
+-    }
++    // [PK] remove telemetry
+ 
+     return strapi
+       .store({
+diff --git a/packages/strapi-plugin-users-permissions/config/functions/bootstrap.js b/packages/strapi-plugin-users-permissions/config/functions/bootstrap.js
+index 00fd24404..f24f0b7ab 100644
+--- a/packages/strapi-plugin-users-permissions/config/functions/bootstrap.js
++++ b/packages/strapi-plugin-users-permissions/config/functions/bootstrap.js
+@@ -95,6 +95,14 @@ module.exports = async () => {
+       callback: `${strapi.config.server.url}/auth/twitch/callback`,
+       scope: ['user:read:email'],
+     },
++    apple: {
++      enabled: false,
++      icon: 'apple',
++      key: '',
++      secret: '',
++      callback: `${strapi.config.server.url}/auth/apple/callback`,
++      scope: ['name email'],
++    },
+     linkedin: {
+       enabled: false,
+       icon: 'linkedin',
+diff --git a/packages/strapi-plugin-users-permissions/controllers/Auth.js b/packages/strapi-plugin-users-permissions/controllers/Auth.js
+index d699e00ff..1c0cb9d59 100644
+--- a/packages/strapi-plugin-users-permissions/controllers/Auth.js
++++ b/packages/strapi-plugin-users-permissions/controllers/Auth.js
+@@ -248,10 +248,11 @@ module.exports = {
+       .get();
+ 
+     const [requestPath] = ctx.request.url.split('?');
+-    const provider = requestPath.split('/')[2];
++    // [PK] if we have a prefix url, the provider value position in the url is [3]
++    const provider = requestPath.split('/')[2] === 'connect' ? requestPath.split('/')[3] : requestPath.split('/')[2];
+ 
+     if (!_.get(grantConfig[provider], 'enabled')) {
+-      return ctx.badRequest(null, 'This provider is disabled.');
++      return ctx.badRequest(null, 'This provider is disabled.' + provider);
+     }
+ 
+     if (!strapi.config.server.url.startsWith('http')) {
+diff --git a/packages/strapi-plugin-users-permissions/services/Providers.js b/packages/strapi-plugin-users-permissions/services/Providers.js
+index 7db8fd71b..2702f6535 100644
+--- a/packages/strapi-plugin-users-permissions/services/Providers.js
++++ b/packages/strapi-plugin-users-permissions/services/Providers.js
+@@ -14,6 +14,32 @@ const purestConfig = require('@purest/providers');
+ const { getAbsoluteServerUrl } = require('strapi-utils');
+ const jwt = require('jsonwebtoken');
+ 
++// [PK] parse id_token for apple sign in
++function base64urlUnescape(str) {
++  str += new Array(5 - str.length % 4).join('=');
++  return str.replace(/\-/g, '+').replace(/_/g, '/');
++}
++function unescapeAppleIdToken(idToken, cb) {
++  // Jwt format: header . body . signature
++  var segments = idToken.split('.');
++  if (segments.length > 3) return cb(new Error('Jwt cannot be parsed'));
++  try {
++    // parse body only
++    const body = JSON.parse(Buffer.from(base64urlUnescape(segments[1]), 'base64'));
++    if (new Date(body.exp*1000) < new Date()) {
++      return cb(new Error('Jwt is expired'));
++    }
++
++    cb(null, {
++      username: body.email.split('@')[0],
++      email: body.email,
++    });
++  } 
++  catch(e) {
++    return cb(e);
++  }
++}
++
+ /**
+  * Connect thanks to a third-party provider.
+  *
+@@ -532,6 +558,15 @@ const getProfile = async (provider, query, callback) => {
+         });
+       break;
+     }
++
++    // [PK] add apple sign in
++    // See https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
++    case 'apple': {
++      const { id_token } = query;
++      unescapeAppleIdToken(id_token, callback);
++      break;
++    }
++
+     default:
+       callback(new Error('Unknown provider.'));
+       break;
+diff --git a/packages/strapi-provider-upload-local/lib/index.js b/packages/strapi-provider-upload-local/lib/index.js
+index 9997cea1a..abbd43fce 100644
+--- a/packages/strapi-provider-upload-local/lib/index.js
++++ b/packages/strapi-provider-upload-local/lib/index.js
+@@ -17,8 +17,8 @@ module.exports = {
+       }
+     };
+     const configPublicPath = strapi.config.get(
+-      'middleware.settings.public.path',
+-      strapi.config.paths.static
++      'paths.static',
++      strapi.config.middleware.settings.public.path
+     );
+ 
+     const uploadDir = path.resolve(strapi.dir, configPublicPath);
+diff --git a/packages/strapi-utils/lib/sanitize-entity.js b/packages/strapi-utils/lib/sanitize-entity.js
+index d144679b0..2241e5117 100644
+--- a/packages/strapi-utils/lib/sanitize-entity.js
++++ b/packages/strapi-utils/lib/sanitize-entity.js
+@@ -11,7 +11,7 @@ const {
+ 
+ const { ID_ATTRIBUTE } = constants;
+ 
+-const sanitizeEntity = (dataSource, options) => {
++const sanitizeEntity = (dataSource, options, ignore) => {
+   const { model, withPrivate = false, isOutput = true, includeFields = null } = options;
+ 
+   if (typeof dataSource !== 'object' || _.isNil(dataSource)) {
+@@ -46,6 +46,9 @@ const sanitizeEntity = (dataSource, options) => {
+     if (shouldRemoveAttribute(model, key, attribute, { withPrivate, isOutput })) {
+       return acc;
+     }
++    if (ignore && ignore.find(e => e === key)) {
++      return acc;
++    }
+ 
+     // Relations
+     const relation = attribute && (attribute.model || attribute.collection || attribute.component);
+diff --git a/packages/strapi/lib/Strapi.js b/packages/strapi/lib/Strapi.js
+index e1159f47c..3c9cd9a20 100644
+--- a/packages/strapi/lib/Strapi.js
++++ b/packages/strapi/lib/Strapi.js
+@@ -2,7 +2,8 @@
+ 
+ const http = require('http');
+ const path = require('path');
+-const fse = require('fs-extra');
++// [PK] fse replacement
++const fse = require('fs');
+ const Koa = require('koa');
+ const Router = require('koa-router');
+ const _ = require('lodash');
+@@ -24,8 +25,9 @@ const { webhookModel, createWebhookStore } = require('./services/webhook-store')
+ const { createCoreStore, coreStoreModel } = require('./services/core-store');
+ const createEntityService = require('./services/entity-service');
+ const entityValidator = require('./services/entity-validator');
+-const createTelemetry = require('./services/metrics');
+-const createUpdateNotifier = require('./utils/update-notifier');
++// [PK] remove telemetry
++// [PK] remove createUpdateNotifier()
++
+ const ee = require('./utils/ee');
+ 
+ const LIFECYCLES = {
+@@ -71,7 +73,7 @@ class Strapi {
+ 
+     this.requireProjectBootstrap();
+ 
+-    createUpdateNotifier(this).notify();
++    // [PK] remove createUpdateNotifier()
+   }
+ 
+   get EE() {
+@@ -228,7 +230,7 @@ class Strapi {
+       await this.db.destroy();
+     }
+ 
+-    this.telemetry.destroy();
++    // [PK] remove telemetry
+ 
+     delete global.strapi;
+   }
+@@ -240,8 +242,10 @@ class Strapi {
+     const onListen = async err => {
+       if (err) return this.stopWithError(err);
+ 
++      // [PK] remove unnecessary code
+       // Is the project initialised?
+-      const isInitialised = await utils.isInitialised(this);
++      const isInitialised = true; //await utils.isInitialised(this);
++      //
+ 
+       // Should the startup message be displayed?
+       const hideStartupMessage = process.env.STRAPI_HIDE_STARTUP_MESSAGE
+@@ -256,15 +260,7 @@ class Strapi {
+         }
+       }
+ 
+-      // Get database clients
+-      const databaseClients = _.map(this.config.get('connections'), _.property('settings.client'));
+-
+-      // Emit started event.
+-      await this.telemetry.send('didStartServer', {
+-        database: databaseClients,
+-        plugins: this.config.installedPlugins,
+-        providers: this.config.installedProviders,
+-      });
++      // [PK] remove telemetry
+ 
+       if (cb && typeof cb === 'function') {
+         cb();
+@@ -317,14 +313,16 @@ class Strapi {
+   }
+ 
+   async load() {
+-    this.app.use(async (ctx, next) => {
+-      if (ctx.request.url === '/_health' && ['HEAD', 'GET'].includes(ctx.request.method)) {
+-        ctx.set('strapi', 'You are so French!');
+-        ctx.status = 204;
+-      } else {
+-        await next();
+-      }
+-    });
++    if (process.env.NODE_ENV === 'development') {
++      this.app.use(async (ctx, next) => {
++        if (ctx.request.url.endsWith('/_health') && ['HEAD', 'GET'].includes(ctx.request.method)) {
++          ctx.set('strapi', 'You are so French!');
++          ctx.status = 204;
++        } else {
++          await next();
++        }
++      });
++    }
+ 
+     const modules = await loadModules(this);
+ 
+@@ -370,7 +368,7 @@ class Strapi {
+       entityValidator: this.entityValidator,
+     });
+ 
+-    this.telemetry = createTelemetry(this);
++    // [PK] remove telemetry
+ 
+     // Initialize hooks and middlewares.
+     await initializeMiddlewares.call(this);
+diff --git a/packages/strapi/lib/commands/develop.js b/packages/strapi/lib/commands/develop.js
+index 833f89347..fcb065c9e 100644
+--- a/packages/strapi/lib/commands/develop.js
++++ b/packages/strapi/lib/commands/develop.js
+@@ -25,7 +25,8 @@ module.exports = async function({ build, watchAdmin, polling, browser }) {
+   // Don't run the build process if the admin is in watch mode
+   if (build && !watchAdmin && serveAdminPanel && !buildExists) {
+     try {
+-      execa.shellSync('npm run -s build -- --no-optimization', {
++      // [PK] change script name
++      execa.shellSync('npm run -s build:admin', {
+         stdio: 'inherit',
+       });
+     } catch (err) {
+diff --git a/packages/strapi/lib/core/app-configuration/index.js b/packages/strapi/lib/core/app-configuration/index.js
+index 8abff52d5..782841236 100644
+--- a/packages/strapi/lib/core/app-configuration/index.js
++++ b/packages/strapi/lib/core/app-configuration/index.js
+@@ -3,11 +3,17 @@
+ const os = require('os');
+ const path = require('path');
+ const _ = require('lodash');
++// [PK] replace .env
+ const dotenv = require('dotenv');
+ 
+-dotenv.config({ path: process.env.ENV_PATH });
+-
+ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
++dotenv.config({
++  path: require('fs').existsSync(`.env.${process.env.NODE_ENV}.local`)
++    ? `.env.${process.env.NODE_ENV}.local`
++    : require('fs').existsSync(`.env.${process.env.NODE_ENV}`)
++    ? `.env.${process.env.NODE_ENV}`
++    : `.env`,
++});
+ 
+ const getPrefixedDeps = require('../../utils/get-prefixed-dependencies');
+ const loadPolicies = require('../load-policies');
+diff --git a/packages/strapi/lib/core/fs_extra.js b/packages/strapi/lib/core/fs_extra.js
+new file mode 100644
+index 000000000..030091593
+--- /dev/null
++++ b/packages/strapi/lib/core/fs_extra.js
+@@ -0,0 +1,54 @@
++'use strict';
++
++const fs = require('fs')
++const { existsSync, readdirSync:fsReaddirSync, readJsonSync:fsReadJsonSync } = fs;
++const { access, readdir:fsReaddir, stat } = fs.promises;
++
++/**
++ * [PK] fs helper
++ */
++
++module.exports = {
++  /**
++   * use functions in fs
++   */    
++  existsSync,
++  stat,
++
++  /**
++   * exception handling
++   */
++  async exists(path) {
++    try {
++      await access(path);
++      return true;
++    } catch {
++      return false;
++    }
++  },
++
++  async readdir(path) {
++    try {
++      return await fsReaddir(path);
++    } catch {
++      return [];
++    }
++  },
++
++  readdirSync(path, opt) {
++    try {
++      return fsReaddirSync(path, opt);
++    } catch {
++      return [];
++    }
++  },
++
++  readJsonSync(path) {
++    try {
++      return fsReadJsonSync(path);
++    } catch {
++      return null;
++    }
++  },
++
++};
+diff --git a/packages/strapi/lib/core/load-apis.js b/packages/strapi/lib/core/load-apis.js
+index 0f7f9857d..ea827df3e 100644
+--- a/packages/strapi/lib/core/load-apis.js
++++ b/packages/strapi/lib/core/load-apis.js
+@@ -1,7 +1,8 @@
+ 'use strict';
+ 
+ const { join } = require('path');
+-const { existsSync } = require('fs-extra');
++// [PK] fse replacement
++const { existsSync } = require('./fs_extra');
+ const _ = require('lodash');
+ const loadFiles = require('../load/load-files');
+ const loadConfig = require('../load/load-config-files');
+diff --git a/packages/strapi/lib/core/load-components.js b/packages/strapi/lib/core/load-components.js
+index 8d6f85ea1..83801e24a 100644
+--- a/packages/strapi/lib/core/load-components.js
++++ b/packages/strapi/lib/core/load-components.js
+@@ -2,7 +2,8 @@
+ 
+ const { join } = require('path');
+ const _ = require('lodash');
+-const { exists } = require('fs-extra');
++// [PK] fse replacement
++const { exists } = require('./fs_extra');
+ const loadFiles = require('../load/load-files');
+ 
+ module.exports = async strapi => {
+diff --git a/packages/strapi/lib/core/load-extensions.js b/packages/strapi/lib/core/load-extensions.js
+index 84ab1fda8..9af6b6f19 100644
+--- a/packages/strapi/lib/core/load-extensions.js
++++ b/packages/strapi/lib/core/load-extensions.js
+@@ -1,8 +1,9 @@
+ 'use strict';
+ 
+ const path = require('path');
+-const { existsSync } = require('fs-extra');
+-const fse = require('fs-extra');
++// [PK] fse replacement
++const { existsSync } = require('./fs_extra');
++const fse = require('./fs_extra');
+ const _ = require('lodash');
+ const loadConfig = require('../load/load-config-files');
+ const loadFiles = require('../load/load-files');
+diff --git a/packages/strapi/lib/core/load-functions.js b/packages/strapi/lib/core/load-functions.js
+index 30c7bbcf4..f77152a3a 100644
+--- a/packages/strapi/lib/core/load-functions.js
++++ b/packages/strapi/lib/core/load-functions.js
+@@ -1,6 +1,7 @@
+ 'use strict';
+ 
+-const fse = require('fs-extra');
++// [PK] fse replacement
++const fse = require('./fs_extra');
+ 
+ const walk = require('./walk');
+ 
+diff --git a/packages/strapi/lib/core/load-hooks.js b/packages/strapi/lib/core/load-hooks.js
+index 27f7e1869..e66bed44f 100644
+--- a/packages/strapi/lib/core/load-hooks.js
++++ b/packages/strapi/lib/core/load-hooks.js
+@@ -1,8 +1,9 @@
+ 'use strict';
+ 
+ // Dependencies.
++// [PK] fse replacement
++const fs = require('./fs_extra');
+ const path = require('path');
+-const fs = require('fs-extra');
+ const _ = require('lodash');
+ const glob = require('../load/glob');
+ const findPackagePath = require('../load/package-path');
+diff --git a/packages/strapi/lib/core/load-middlewares.js b/packages/strapi/lib/core/load-middlewares.js
+index 5c7a4ced6..7e152cdc3 100644
+--- a/packages/strapi/lib/core/load-middlewares.js
++++ b/packages/strapi/lib/core/load-middlewares.js
+@@ -1,8 +1,9 @@
+ 'use strict';
+ 
+ // Dependencies.
++// [PK] fse replacement
++const fs = require('./fs_extra');
+ const path = require('path');
+-const fs = require('fs-extra');
+ const _ = require('lodash');
+ const glob = require('../load/glob');
+ const findPackagePath = require('../load/package-path');
+diff --git a/packages/strapi/lib/core/load-plugins.js b/packages/strapi/lib/core/load-plugins.js
+index 1591503cd..ab3ec3fc5 100644
+--- a/packages/strapi/lib/core/load-plugins.js
++++ b/packages/strapi/lib/core/load-plugins.js
+@@ -1,7 +1,8 @@
+ 'use strict';
+ 
+ const { join } = require('path');
+-const { existsSync } = require('fs-extra');
++// [PK] fse replacement
++const { existsSync } = require('./fs_extra');
+ const _ = require('lodash');
+ const findPackagePath = require('../load/package-path');
+ const loadFiles = require('../load/load-files');
+diff --git a/packages/strapi/lib/core/load-policies.js b/packages/strapi/lib/core/load-policies.js
+index bbdb40bf6..ce18ad4a4 100644
+--- a/packages/strapi/lib/core/load-policies.js
++++ b/packages/strapi/lib/core/load-policies.js
+@@ -3,7 +3,8 @@
+ const assert = require('assert');
+ const path = require('path');
+ const _ = require('lodash');
+-const fse = require('fs-extra');
++// [PK] fse replacement
++const fse = require('fs');
+ 
+ module.exports = dir => {
+   if (!fse.existsSync(dir)) return {};
+diff --git a/packages/strapi/lib/core/walk.js b/packages/strapi/lib/core/walk.js
+index ca6b45c62..b34c0a562 100644
+--- a/packages/strapi/lib/core/walk.js
++++ b/packages/strapi/lib/core/walk.js
+@@ -2,7 +2,8 @@
+ 
+ const assert = require('assert');
+ const path = require('path');
+-const fse = require('fs-extra');
++// [PK] fse replacement
++const fse = require('./fs_extra');
+ 
+ module.exports = function walk(dir, { loader } = {}) {
+   assert(typeof loader === 'function', 'opts.loader must be a function');
+diff --git a/packages/strapi/lib/middlewares/public/index.html b/packages/strapi/lib/middlewares/public/index.html
+index 6faa0d75f..f580ab4a8 100644
+--- a/packages/strapi/lib/middlewares/public/index.html
++++ b/packages/strapi/lib/middlewares/public/index.html
+@@ -15,7 +15,7 @@
+   </head>
+   <body lang="en">
+     <section class="wrapper">
+-      <h1><img class="logo" src="<%= strapi.config.server.url %>/assets/images/logo_login.png" /></h1>
++      <h2><%= strapi.config.info.name %></h2>
+       <% if (strapi.config.environment === 'development' && isInitialised) { %>
+         <div class="informations">
+           <div>
+@@ -36,11 +36,7 @@
+           <h2>Let's get started!</h2>
+           <p>To discover the power provided by Strapi, you need to create an administrator.</p>
+           <a class="cta cta-secondary" href="<%= strapi.config.admin.url %>" target="_blank" title="Click to create the first administration" ><i class="fas fa-external-link-alt"></i>Create the first administrator</a>
+-          <div class="people-saying-hello">
+-            <img class="visible" src="<%= strapi.config.server.url %>/assets/images/group_people_1.png" alt="People saying hello" />
+-            <img src="<%= strapi.config.server.url %>/assets/images/group_people_2.png" alt="People saying hello" />
+-            <img src="<%= strapi.config.server.url %>/assets/images/group_people_3.png" alt="People saying hello" />
+-          </div>
++<!--[PK] remove useless part-->
+         </div>
+       <% } else { %>
+         <div class="informations">
+diff --git a/packages/strapi/lib/middlewares/public/index.js b/packages/strapi/lib/middlewares/public/index.js
+index 215b4c0e3..b4a67dd7a 100644
+--- a/packages/strapi/lib/middlewares/public/index.js
++++ b/packages/strapi/lib/middlewares/public/index.js
+@@ -81,18 +81,19 @@ module.exports = strapi => {
+       if (!strapi.config.serveAdminPanel) return;
+ 
+       const buildDir = path.resolve(strapi.dir, 'build');
+-      const serveAdmin = ctx => {
+-        ctx.type = 'html';
+-        ctx.body = fs.createReadStream(path.join(buildDir + '/index.html'));
+-      };
++      // [PK] fix prefix-url issue
++      // main router already has a prefix. so add a path w/o url prefix for static file service
++      const adminPathWoPrefix = strapi.config.admin.path.replace(strapi.config.get('middleware.settings.router.prefix', ''), '');
+ 
+       strapi.router.get(
+-        `${strapi.config.admin.path}/*`,
++        `${adminPathWoPrefix}/*`,
+         serveStatic(buildDir, { maxage: maxAge, defer: false, index: 'index.html' })
+       );
+ 
+-      strapi.router.get(`${strapi.config.admin.path}`, serveAdmin);
+-      strapi.router.get(`${strapi.config.admin.path}/*`, serveAdmin);
++      strapi.router.get(`${adminPathWoPrefix}*`, ctx => {
++        ctx.type = 'html';
++        ctx.body = fs.createReadStream(path.join(buildDir + '/index.html'));
++      });
+     },
+   };
+ };
+diff --git a/packages/strapi/lib/middlewares/router/index.js b/packages/strapi/lib/middlewares/router/index.js
+index d4f82d363..afaa5d62d 100644
+--- a/packages/strapi/lib/middlewares/router/index.js
++++ b/packages/strapi/lib/middlewares/router/index.js
+@@ -29,7 +29,8 @@ module.exports = strapi => {
+ 
+       if (_.has(strapi.admin, 'config.routes')) {
+         const router = new Router({
+-          prefix: '/admin',
++          // [PK] fix prefix-url issue
++          prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/admin`,
+         });
+ 
+         _.get(strapi.admin, 'config.routes', []).forEach(route => {
+@@ -43,8 +44,10 @@ module.exports = strapi => {
+       if (strapi.plugins) {
+         // Parse each plugin's routes.
+         _.forEach(strapi.plugins, (plugin, pluginName) => {
++
+           const router = new Router({
+-            prefix: `/${pluginName}`,
++            // [PK] fix prefix-url issue
++            prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/${pluginName}`,
+           });
+ 
+           (plugin.config.routes || []).forEach(route => {
+@@ -55,6 +58,12 @@ module.exports = strapi => {
+             });
+           });
+ 
++          // [PK] router tracing
++          //strapi.log.debug(">>>>>>>>>> PLUGIN ROUTER:", pluginName);
++          //router.stack.forEach((item) => {
++          //  strapi.log.debug('  ', item.methods, '\t', item.path);
++          //});
++        
+           // Mount plugin router
+           strapi.app.use(router.routes()).use(router.allowedMethods());
+         });
+diff --git a/packages/strapi/lib/services/metrics/index.js b/packages/strapi/lib/services/metrics/index.js
+index f80843b22..d301cc82e 100644
+--- a/packages/strapi/lib/services/metrics/index.js
++++ b/packages/strapi/lib/services/metrics/index.js
+@@ -23,8 +23,9 @@ const LIMITED_EVENTS = [
+ ];
+ 
+ const createTelemetryInstance = strapi => {
+-  const { uuid } = strapi.config;
+-  const isDisabled = !uuid || isTruthy(process.env.STRAPI_TELEMETRY_DISABLED);
++  const uuid = strapi.config.uuid;
++  // [PK] disable sending ping event
++  const isDisabled = true; // !uuid || isTruthy(process.env.STRAPI_TELEMETRY_DISABLED);
+ 
+   const crons = [];
+   const sender = createSender(strapi);
+diff --git a/packages/strapi/lib/services/metrics/sender.js b/packages/strapi/lib/services/metrics/sender.js
+index 9ab2fac49..979755546 100644
+--- a/packages/strapi/lib/services/metrics/sender.js
++++ b/packages/strapi/lib/services/metrics/sender.js
+@@ -1,76 +1,10 @@
+ 'use strict';
+ 
+-const os = require('os');
+-const _ = require('lodash');
+-const isDocker = require('is-docker');
+-const { machineIdSync } = require('node-machine-id');
+-const fetch = require('node-fetch');
+-const ciEnv = require('ci-info');
+-const ee = require('../../utils/ee');
+-const stringifyDeep = require('./stringify-deep');
+-
+-const defaultQueryOpts = {
+-  timeout: 1000,
+-  headers: { 'Content-Type': 'application/json' },
+-};
+-
+-const ANALYTICS_URI = 'https://analytics.strapi.io';
+-
+-/**
+- * Add properties from the package.json strapi key in the metadata
+- * @param {object} metadata
+- */
+-const addPackageJsonStrapiMetadata = (metadata, strapi) => {
+-  const { packageJsonStrapi = {} } = strapi.config;
+-
+-  _.defaults(metadata, packageJsonStrapi);
+-};
+-
+ /**
+  * Create a send function for event with all the necessary metadatas
+  * @param {Object} strapi strapi app
+  * @returns {Function} (event, payload) -> Promise{boolean}
+  */
+-module.exports = strapi => {
+-  const { uuid } = strapi.config;
+-  const deviceId = machineIdSync();
+-  const isEE = strapi.EE === true && ee.isEE === true;
+-
+-  const anonymous_metadata = {
+-    environment: strapi.config.environment,
+-    os: os.type(),
+-    osPlatform: os.platform(),
+-    osRelease: os.release(),
+-    nodeVersion: process.version,
+-    docker: process.env.DOCKER || isDocker(),
+-    isCI: ciEnv.isCI,
+-    version: strapi.config.info.strapi,
+-    strapiVersion: strapi.config.info.strapi,
+-    projectType: isEE ? 'Enterprise' : 'Community',
+-  };
+-
+-  addPackageJsonStrapiMetadata(anonymous_metadata, strapi);
+-
+-  return async (event, payload = {}, opts = {}) => {
+-    const reqParams = {
+-      method: 'POST',
+-      body: JSON.stringify({
+-        event,
+-        uuid,
+-        deviceId,
+-        properties: stringifyDeep({
+-          ...payload,
+-          ...anonymous_metadata,
+-        }),
+-      }),
+-      ..._.merge({}, defaultQueryOpts, opts),
+-    };
+-
+-    try {
+-      const res = await fetch(`${ANALYTICS_URI}/track`, reqParams);
+-      return res.ok;
+-    } catch (err) {
+-      return false;
+-    }
+-  };
++module.exports = () => {
++  // [PK] remove telemetry
+ };
+diff --git a/packages/strapi/lib/utils/ee.js b/packages/strapi/lib/utils/ee.js
+index d02366a70..b498f44b4 100644
+--- a/packages/strapi/lib/utils/ee.js
++++ b/packages/strapi/lib/utils/ee.js
+@@ -13,8 +13,8 @@ const noLog = {
+   warn: noop,
+   info: noop,
+ };
+-
+-const internals = {};
++// [PK] hack EE
++const internals = { isEE: true, licenseInfo: { type: "silver" } };
+ const features = {
+   bronze: [],
+   silver: [],
+diff --git a/yarn.lock b/yarn.lock
+index 8268064a8..d10f8eaad 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -7528,7 +7528,7 @@ dot-prop@^5.1.0, dot-prop@^5.2.0:
+   dependencies:
+     is-obj "^2.0.0"
+ 
+-dotenv@8.2.0:
++dotenv@~8.2.0:
+   version "8.2.0"
+   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
+   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==

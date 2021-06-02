@@ -2,8 +2,6 @@
  * Global Setup
  */
 
-const { dropDB } = require("./_helpers/db");
-
 module.exports = async () => {
-  await dropDB(true);
+  //console.log("\n***************** global-setup.js", JSON.stringify(this.global, null, 2));
 };
