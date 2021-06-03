@@ -1,6 +1,7 @@
 module.exports = async (ctx, next) => {
-  if (!ctx.state.user) return ctx.unauthorized("unauthorized");
-  console.log(">>> isAdministrativeRole(): ", ctx.state.user.role.type, ctx.state.user.username);
-  if (ctx.state.user.role.type !== "administrative") return ctx.unauthorized("not allowed");
+  const { user } = ctx.state;
+  if (!user) return ctx.unauthorized("unauthorized");
+  console.log(">>> isAdministrativeRole(): ", user.role.type, user.email);
+  if (user.role.type !== "administrative") return ctx.unauthorized("not allowed");
   await next();
 };

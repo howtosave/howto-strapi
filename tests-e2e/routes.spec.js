@@ -38,13 +38,24 @@ const _route_sort = (r1, r2) =>
 const targetRoutes = require("./routes-data");
 
 const testUsersInput = {
+  public: { headers: {} },
   authenticated: {
     username: "e2e_test_001",
     password: "testuser0!0!)!)!",
     email: "__e2e_test_001__@local.host",
     role: "authenticated",
-    user: {},
+    headers: {},
   },
+  //
+  // N.B.
+  // You need to give this user 'administrative' role on the admin-console
+  administrative: {
+    username: "e2e_admin_test_001",
+    password: "admintestuser0!0!)!)!",
+    email: "__e2e_admin_test_001__@local.host",
+    role: "administrative",
+    headers: {},
+  }
 };
 
 const testContext = {
@@ -52,32 +63,27 @@ const testContext = {
   resData: {},
 };
 
-const rolesInfo = {
-  public: {
-    headers: {},
-  },
-
-  authenticated: {
-    headers: {},
-  },
-};
-
 beforeAll(async () => {
+  // create users
   const promises = Object.keys(testUsersInput).map(async (userRole) => (
-    testContext.testUsers[userRole] = await createUserViaApi(testUsersInput[userRole], global.serverConfig.serverUrl)
+    testUsersInput[userRole].role ? testContext.testUsers[userRole] = await createUserViaApi(testUsersInput[userRole], global.serverConfig.serverUrl) : Promise.resolve()
   ));
   await Promise.all(promises);
-  Object.keys(testContext.testUsers).forEach((userRole) => (
-    rolesInfo[userRole].headers["Authorization"] = `Bearer ${testContext.testUsers[userRole].jwt}`
+
+  // set header
+  Object.keys(testUsersInput).forEach((userRole) => (
+    (testContext.testUsers[userRole]) ?
+    testUsersInput[userRole]["headers"]["Authorization"] = `Bearer ${testContext.testUsers[userRole].jwt}` : null
   ));
 });
 
 afterAll(async () => {
-  const promises = Object.keys(testContext.testUsers).map((userRole) => {
-    const user = testContext.testUsers[userRole];
-    return deleteUserViaApi(user, user.jwt, global.serverConfig.serverUrl);
-  });
-  await Promise.all(promises);
+  // remove users
+  //const promises = Object.keys(testContext.testUsers).map((userRole) => {
+  //   const user = testContext.testUsers[userRole];
+  //   return deleteUserViaApi(user, user.jwt, global.serverConfig.serverUrl);
+  // });
+  // await Promise.all(promises);
 });
 
 //
@@ -88,7 +94,7 @@ afterAll(async () => {
 // level 3:     by routes
 for (const [apiName, routeData] of Object.entries(targetRoutes)) {
   describe(`# ${apiName}:`, () => {
-    for (const [ridx, [roleName, roleData]] of Object.entries(Object.entries(rolesInfo))) {
+    for (const [ridx, [roleName, userInput]] of Object.entries(Object.entries(testUsersInput))) {
       const { routes } = routeData;
       //
       // 테스트 할 routes를 name prop이 있는 항목을 우선(위)으로 정렬한다.
@@ -156,10 +162,10 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
               case "POST":
               case "PUT":
                 // send data
-                res = await _method(method)(`${path}`).send(send).set(roleData.headers);
+                res = await _method(method)(`${path}`).send(send).set(userInput.headers || {});
                 break;
               default:
-                res = await _method(method)(`${path}`).set(roleData.headers);
+                res = await _method(method)(`${path}`).set(userInput.headers || {});
                 break;
             }
 
@@ -235,11 +241,11 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
                   case "delete":
                   case "update":
                     path = route.path.replace(/:id$/, "invalid_id");
-                    res = await _method(method)(`${path}`).set(roleData.headers);
+                    res = await _method(method)(`${path}`).set(userInput.headers || {});
                     expect(res.status >= 300 && res.status < 500).toBe(true);
                     // valid but unavailble
                     path = route.path.replace(/:id$/, "123456789012345678901234");
-                    res = await _method(method)(`${path}`).set(roleData.headers);
+                    res = await _method(method)(`${path}`).set(userInput.headers || {});
                     expect(res.status >= 300 && res.status < 500).toBe(true);
                     break;
                 }

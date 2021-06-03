@@ -36,25 +36,25 @@ const _cores = (name = "noop") => ({
   service: strapi.services[name], // Service functions
 });
 
-module.exports = {
-  /**
-   * #########################################################
-   *
-   * Custom Controllers
-   *
-   * #########################################################
-   */
+const VERBOSE = false;
 
-  /**
+module.exports = {
+  // #########################################################
+  // Custom Controllers
+  // #########################################################
+
+   /**
    * noop
    *
    * @return '{GET|POST}noop'
    */
   async index(ctx) {
-    strapi.log.debug("Request method:", ctx.request.method);
-    strapi.log.debug("Request header:", ctx.request.header);
-    strapi.log.debug("Request query:", ctx.request.query);
-    strapi.log.debug("Request user:", ctx.state.user);
+    if (VERBOSE) {
+      strapi.log.debug("Request method:", ctx.request.method);
+      strapi.log.debug("Request header:", ctx.request.header);
+      strapi.log.debug("Request query:", ctx.request.query);
+      strapi.log.debug("Request user:", ctx.state.user);
+    }
     if (ctx.request.method === "POST" && !ctx.state.user) {
       return ctx.badRequest("no user");
     }
@@ -68,8 +68,10 @@ module.exports = {
    * }
    */
   async me(ctx) {
-    strapi.log.debug("Request header:", ctx.request.header);
-    strapi.log.debug("Request user: ", ctx.state.user);
+    if (VERBOSE) {
+      strapi.log.debug("Request header:", ctx.request.header);
+      strapi.log.debug("Request user: ", ctx.state.user);
+    }
     const { id, email, username, provider } = ctx.state.user;
     return ctx.send({ id, email, username, provider });
   },
@@ -79,10 +81,12 @@ module.exports = {
    * @return 'admin'
    */
   async admin(ctx) {
-    strapi.log.debug("/noop/admin");
-    strapi.log.debug("Request header:", ctx.request.header);
-    strapi.log.debug("Request Query:", ctx.request.query);
-    strapi.log.debug("Request user:", ctx.state.user);
+    if (VERBOSE) {
+      strapi.log.debug("/noop/admin");
+      strapi.log.debug("Request header:", ctx.request.header);
+      strapi.log.debug("Request Query:", ctx.request.query);
+      strapi.log.debug("Request user:", ctx.state.user);
+    }
     return ctx.send("noop-admin");
   },
 

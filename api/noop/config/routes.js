@@ -8,9 +8,14 @@ module.exports = {
         policies: [],
       },
       __test_data__: {
-        permission_public: 200,
-        permission_authenticated: 200,
-        expect: "expect(res.text).toBe('GET:noop')",
+        permission_public: {
+          status: 200,
+          expect: "expect(res.text).toBe('GET:noop')",
+        },
+        permission_authenticated: {
+          status: 200,
+          expect: "expect(res.text).toBe('GET:noop')",
+        },
       },
     },
     {
@@ -54,6 +59,7 @@ module.exports = {
       },
       __test_data__: {
         permission_authenticated: 401,
+        permission_administrative: 200,
       },
     },
     {
