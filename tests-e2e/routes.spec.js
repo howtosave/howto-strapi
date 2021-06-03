@@ -39,6 +39,7 @@ const targetRoutes = require("./routes-data");
 
 const testUsersInput = {
   public: { headers: {} },
+/*  
   authenticated: {
     username: "e2e_test_001",
     password: "testuser0!0!)!)!",
@@ -48,7 +49,7 @@ const testUsersInput = {
   },
   //
   // N.B.
-  // You need to give this user 'administrative' role on the admin-console
+  // You need to give this user the 'administrative' role on the admin-console
   administrative: {
     username: "e2e_admin_test_001",
     password: "admintestuser0!0!)!)!",
@@ -56,10 +57,13 @@ const testUsersInput = {
     role: "administrative",
     headers: {},
   }
+*/  
 };
 
 const testContext = {
-  testUsers: {},
+  testUsers: {
+    public: { id: 'a' }
+  },
   resData: {},
 };
 
@@ -72,7 +76,7 @@ beforeAll(async () => {
 
   // set header
   Object.keys(testUsersInput).forEach((userRole) => (
-    (testContext.testUsers[userRole]) ?
+    (testContext.testUsers[userRole].jwt) ?
     testUsersInput[userRole]["headers"]["Authorization"] = `Bearer ${testContext.testUsers[userRole].jwt}` : null
   ));
 });
@@ -86,12 +90,13 @@ afterAll(async () => {
   // await Promise.all(promises);
 });
 
-//
-// create test-cases
-//
-// level 1: by apis
-// level 2:   by permissions
-// level 3:     by routes
+/**
+ * create test-cases
+ *
+ * level 1: by apis
+ * level 2:   by permissions
+ * level 3:     by routes
+ */
 for (const [apiName, routeData] of Object.entries(targetRoutes)) {
   describe(`# ${apiName}:`, () => {
     for (const [ridx, [roleName, userInput]] of Object.entries(Object.entries(testUsersInput))) {
@@ -109,22 +114,34 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
         for (const route of routes) {
           const { handler } = route;
           let { method } = route;
+
+          //
+          // lookup order test_data
+          // 1. routeData[${method} ${route.path}]
+          // 2. route.__test_data__
           let { test_data } = routeData;
           if (test_data) test_data = test_data[`${method} ${route.path}`];
           if (!test_data) test_data = route.__test_data__;
 
           // test_data에서 permission 정보를 가져온다.
+          let permissionInfo = {};
+          if (test_data && test_data[`permission_${roleName}`]) {
+            if (typeof test_data[`permission_${roleName}`] === "object")
+              permissionInfo = test_data[`permission_${roleName}`];
+            else 
+              permissionInfo.status = test_data[`permission_${roleName}`];
+          }
           // 해당 role에 대한 permission 정보가 없으면 default는 403(Forbidden)이다.
-          const permission = (test_data && test_data[`permission_${roleName}`]) || 403;
-          const permissionStatus =
-            Number.isInteger(permission) || permission === "skip" ? permission : permission.status;
-
-          it(`### ${handler}: ${method} ${route.path} should be ${permissionStatus}`, async () => {
+          if (!permissionInfo.status) permissionInfo.status = 403;
+          
+          //
+          // create test
+          it(`### ${handler}: ${method} ${route.path} should be ${permissionInfo.status}`, async () => {
             // skip permission check
-            if (permission === "skip") return;
+            if (permissionInfo.status === "skip") return;
 
             // set test user. you shoud do it HERE!
-            requestContext.user = testContext.testUsers["authenticated"];
+            requestContext.user = testContext.testUsers[roleName];
             let path,
               send = "",
               name = "";
@@ -138,23 +155,22 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
               path = route.path;
             } else {
               // override method
-              method = permission[`override`] || method;
+              method = permissionInfo[`override`] || method;
 
               const toPath = compile(route.path, { encode: encodeURIComponent });
-              const paramsTmpl = permission[`params`] || test_data.params;
+              const paramsTmpl = permissionInfo[`params`] || test_data.params;
               const params = paramsTmpl ? _.template(paramsTmpl)(extendedData) : "";
 
               path = params ? toPath(eval(`(${params})`)) : route.path;
-              const query = permission[`query`] || test_data[`query`] || "";
+              const query = permissionInfo[`query`] || test_data[`query`] || "";
               if (query) path += `?${query}`;
 
-              send = permission[`send`] || test_data[`send`] || "";
+              send = permissionInfo[`send`] || test_data[`send`] || "";
               send = send && _.template(send)(extendedData);
               send = send && eval(`(${send})`);
 
-              name = permission[`name`] || test_data[`name`] || "";
+              name = permissionInfo[`name`] || test_data[`name`] || "";
             }
-
             //
             // make request
             let res;
@@ -171,14 +187,14 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
 
             //
             // check the response
-            if (res.status !== permissionStatus) {
+            if (res.status !== permissionInfo.status) {
               console.log(
-                `>>> FAILURE: ${handler} > ${roleName} > ${method} ${path}: ${permissionStatus} !== ${res.status}`
+                `>>> FAILURE: ${handler} > ${roleName} > ${method} ${path}: ${permissionInfo.status} !== ${res.status}`
               );
               console.log(`   RES.BODY: ${JSON.stringify(res.body)}`);
             }
-            expect(res.status).toBe(permissionStatus);
-            const customExpect = permission[`expect`] || (test_data && test_data[`expect`]);
+            expect(res.status).toBe(permissionInfo.status);
+            const customExpect = permissionInfo[`expect`] || (test_data && test_data[`expect`]);
             if (customExpect) {
               if (Array.isArray(customExpect)) {
                 customExpect.forEach((exp) => {
@@ -233,8 +249,8 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
             }
             //
             // check basic exception handler
-            if (permissionStatus !== 403) {
-              if (route.path.match(/:id$/)) {
+            if (permissionInfo.status !== 403) {
+              if (route.path.match(/:id$/)) { // ends with ':id'
                 let path;
                 switch (actionType) {
                   case "findOne":
