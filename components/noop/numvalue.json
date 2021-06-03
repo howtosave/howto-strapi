@@ -1,0 +1,17 @@
+{
+  "connection": "default",
+  "collectionName": "components_noop_numvalues",
+  "info": {
+    "name": "numvalue",
+    "description": "number value for noop. would be better *name=file-name*",
+    "icon": "arrow-circle-right"
+  },
+  "options": {
+    "timestamps": false
+  },
+  "attributes": {
+    "value": {
+      "type": "decimal"
+    }
+  }
+}
