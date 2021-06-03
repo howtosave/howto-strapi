@@ -39,7 +39,7 @@ const targetRoutes = require("./routes-data");
 
 const testUsersInput = {
   public: { headers: {} },
-/*  
+
   authenticated: {
     username: "e2e_test_001",
     password: "testuser0!0!)!)!",
@@ -47,7 +47,7 @@ const testUsersInput = {
     role: "authenticated",
     headers: {},
   },
-  //
+  /**
   // N.B.
   // You need to give this user the 'administrative' role on the admin-console
   administrative: {
@@ -56,8 +56,7 @@ const testUsersInput = {
     email: "__e2e_admin_test_001__@local.host",
     role: "administrative",
     headers: {},
-  }
-*/  
+  } */
 };
 
 const testContext = {
@@ -83,11 +82,11 @@ beforeAll(async () => {
 
 afterAll(async () => {
   // remove users
-  //const promises = Object.keys(testContext.testUsers).map((userRole) => {
-  //   const user = testContext.testUsers[userRole];
-  //   return deleteUserViaApi(user, user.jwt, global.serverConfig.serverUrl);
-  // });
-  // await Promise.all(promises);
+  const promises = Object.keys(testContext.testUsers).map((userRole) => {
+    const user = testContext.testUsers[userRole];
+    return user.jwt && deleteUserViaApi(user, user.jwt, global.serverConfig.serverUrl);
+  });
+  await Promise.all(promises);
 });
 
 /**
