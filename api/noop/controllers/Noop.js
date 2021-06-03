@@ -11,7 +11,6 @@
  * https://strapi.io/documentation/v3.x/concepts/controllers.html#controllers
  */
 
-const fs = require("fs");
 const {
   parseMultipartData, // parses Strapi's formData format.
   sanitizeEntity, // removes all private fields from the model and its relations

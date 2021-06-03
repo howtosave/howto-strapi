@@ -1,14 +1,11 @@
-/**
- * Routes test
- *
- * 기본적인 e2e test를 수행한다.
- */
 
 const request = require("supertest");
 const _ = require("lodash");
 const { compile } = require("path-to-regexp");
-const userHelper = require("../_helpers/user-utils");
-
+const {
+  createUserViaApi,
+  deleteUserViaApi,
+} = require("./user-utils");
 //
 // http request functions
 const _req_functions = request(global.serverConfig.serverUrl);
@@ -38,7 +35,7 @@ const _route_sort = (r1, r2) =>
 
 //
 // routes to be tested
-const targetRoutes = require("./target-routes");
+const targetRoutes = require("./routes-data");
 
 const testUsersInput = {
   authenticated: {
@@ -65,22 +62,22 @@ const rolesInfo = {
   },
 };
 
-beforeAll(async (done) => {
-  const { testUsers } = testContext;
-  testUsers["authenticated"] = await userHelper.createUser(
-    testUsersInput["authenticated"],
-    global.serverConfig.serverUrl
-  );
-  rolesInfo["authenticated"].headers["Authorization"] = `Bearer ${testUsers["authenticated"].jwt}`;
-  done();
+beforeAll(async () => {
+  const promises = Object.keys(testUsersInput).map(async (userRole) => (
+    testContext.testUsers[userRole] = await createUserViaApi(testUsersInput[userRole], global.serverConfig.serverUrl)
+  ));
+  await Promise.all(promises);
+  Object.keys(testContext.testUsers).forEach((userRole) => (
+    rolesInfo[userRole].headers["Authorization"] = `Bearer ${testContext.testUsers[userRole].jwt}`
+  ));
 });
 
-afterAll(async (done) => {
-  for (const userRole in testContext.testUsers) {
+afterAll(async () => {
+  const promises = Object.keys(testContext.testUsers).map((userRole) => {
     const user = testContext.testUsers[userRole];
-    await userHelper.deleteUserViaApi(user.id, user.jwt, global.serverConfig.serverUrl);
-  }
-  done();
+    return deleteUserViaApi(user, user.jwt, global.serverConfig.serverUrl);
+  });
+  await Promise.all(promises);
 });
 
 //
@@ -116,9 +113,9 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
           const permissionStatus =
             Number.isInteger(permission) || permission === "skip" ? permission : permission.status;
 
-          it(`### ${handler}: ${method} ${route.path} should be ${permissionStatus}`, async (done) => {
+          it(`### ${handler}: ${method} ${route.path} should be ${permissionStatus}`, async () => {
             // skip permission check
-            if (permission === "skip") return done();
+            if (permission === "skip") return;
 
             // set test user. you shoud do it HERE!
             requestContext.user = testContext.testUsers["authenticated"];
@@ -248,8 +245,6 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
                 }
               }
             }
-
-            done();
           });
         }
       }); // EO permission description

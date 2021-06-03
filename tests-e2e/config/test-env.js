@@ -10,10 +10,9 @@ const request = require("supertest");
 //
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
 require("dotenv").config({
-  path: require("fs").existsSync(`.env.${process.env.NODE_ENV}.local`)
-    ? `.env.${process.env.NODE_ENV}.local`
-    : require("fs").existsSync(`.env.${process.env.NODE_ENV}`)
-    ? `.env.${process.env.NODE_ENV}` : '.env',
+  path: process.env.NODE_ENV === "production" ? ".env"
+          : require("fs").existsSync(`.env.${process.env.NODE_ENV}.local`) 
+          ? `.env.${process.env.NODE_ENV}.local` : `.env.${process.env.NODE_ENV}`
 });
 
 //
@@ -53,6 +52,8 @@ class TestEnvironment extends NodeEnvironment {
     }
 
     this.global.serverConfig = serverConfig;
+
+    console.log(">>> Trying to make tests for " + serverConfig.serverUrl);
   }
 }
 

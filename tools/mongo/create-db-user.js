@@ -12,10 +12,9 @@
 //
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
 require("dotenv").config({
-  path: require("fs").existsSync(`.env.${process.env.NODE_ENV}.local`)
-    ? `.env.${process.env.NODE_ENV}.local`
-    : require("fs").existsSync(`.env.${process.env.NODE_ENV}`)
-    ? `.env.${process.env.NODE_ENV}` : '.env',
+  path: process.env.NODE_ENV === "production" ? ".env"
+  : require("fs").existsSync(`.env.${process.env.NODE_ENV}.local`) 
+  ? `.env.${process.env.NODE_ENV}.local` : `.env.${process.env.NODE_ENV}`
 });
 
 const { spawn } = require('child_process');

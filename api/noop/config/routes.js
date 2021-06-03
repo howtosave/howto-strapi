@@ -50,9 +50,11 @@ module.exports = {
       path: "/noop/admin",
       handler: "Noop.admin",
       config: {
-        policies: ["isAdministrativeRoleUser"],
+        policies: ["isAdministrativeRole"],
       },
-      __test_data__: {},
+      __test_data__: {
+        permission_authenticated: 401,
+      },
     },
     {
       method: "GET",

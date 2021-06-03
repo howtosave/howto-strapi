@@ -1,29 +1,27 @@
+//
+// routes-data.js
+//
+
+const noop = {
+  routes: require("../api/noop/config/routes").routes,
+};
 
 const users_permissions = {
   routes: require("../extensions/users-permissions/config/routes").routes,
   test_data: {
+    "GET /": {
+      permission_public: "skip",
+      permission_authenticated: "skip",
+    },
+    "GET /custom-route": {
+      permission_public: "skip",
+      permission_authenticated: "skip",
+    },
     "POST /auth/local": {
       permission_public: "skip",
     },
     "GET /auth/:provider/callback": {
       permission_public: "skip",
-    },
-    "POST /auth/local-code": {
-      permission_public: {
-        status: 200,
-        send: "{ code: '${user.jwtCode}', devid: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' }",
-      },
-    },
-    "POST /auth/local-fb": {},
-    "GET /auth/login-as-guest": {
-      permission_public: 200,
-    },
-    "GET /users/:id/check-nickname": {
-      permission_authenticated: {
-        status: 200,
-      },
-      params: "{ id: '${user.id}' }",
-      query: "name=hihi",
     },
     "PUT /users/:id": {
       permission_authenticated: {
@@ -47,5 +45,4 @@ const users_permissions = {
 module.exports = {
   users_permissions,
   noop,
-  //address,
 };
