@@ -107,9 +107,13 @@ node_modules
 testApp
 coverage
 
-exports
 
-*.cache
-
-documentation
+############################
+# Strapi
+############################
+exports/
+.cache/
+build/
+**/documentation/*/*
+!**/documentation/*/overrides
 exports
