@@ -1,7 +1,7 @@
 {
   "name": "howto-strapi",
   "private": true,
-  "version": "3.6.1",
+  "version": "3.6.3",
   "description": "A Strapi application.",
   "scripts": {
     "dev": "strapi develop",
@@ -27,7 +27,7 @@
   "dependencies": {
     "lodash": "^4.17.5",
     "my-api-utils": "*",
-    "strapi": "*",
+    "strapi": "3.6.3",
     "strapi-admin": "*",
     "strapi-connector-bookshelf": "*",
     "strapi-connector-mongoose": "*",
