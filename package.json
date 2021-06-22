@@ -2,7 +2,7 @@
   "name": "howto-strapi",
   "private": true,
   "version": "3.6.3",
-  "description": "A Strapi application.",
+  "description": "A strapi example application.",
   "scripts": {
     "dev": "strapi develop",
     "dev-ce": "STRAPI_DISABLE_EE=true strapi dev",
