@@ -7,6 +7,8 @@
  * mongo mongodb://myroot:root000@127.0.0.1:27017/ --eval "db.getSiblingDB('strapi').createUser({ user:'strapi', pwd: 'strapi', roles: [{ role:'readWrite', db:'strapi' }] });"
  */
 
+const { spawn } = require('child_process');
+
 //
 // load .env
 //
@@ -16,8 +18,6 @@ require("dotenv").config({
   : require("fs").existsSync(`.env.${process.env.NODE_ENV}.local`) 
   ? `.env.${process.env.NODE_ENV}.local` : `.env.${process.env.NODE_ENV}`
 });
-
-const { spawn } = require('child_process');
 
 const ADMIN_USER='myroot';
 const ADMIN_PASS='myroot000';
