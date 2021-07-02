@@ -24,7 +24,8 @@ ROOT_DIR="$_SCRIPT_DIR/../.." # TODO realpath on mac
 pushd "$ROOT_DIR/strapi"
 
 # check the current branch
-if [[ $(git branch --show-current) != "my$DIFF_VERSION" ]]; then
+# git branch --show-current 2.22+
+if [[ $( git rev-parse --abbrev-ref HEAD ) != "my$DIFF_VERSION" ]]; then
   echo "!!! current branch is not my$DIFF_VERSION"
   exit 1
 fi
