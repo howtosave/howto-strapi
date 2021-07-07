@@ -13,10 +13,8 @@
   },
   "attributes": {
     "name": {
-      "type": "string"
-    },
-    "bid": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "allowReply": {
       "type": "boolean",

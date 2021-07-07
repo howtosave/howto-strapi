@@ -3,14 +3,54 @@
     {
       "method": "GET",
       "path": "/",
-      "handler": "board.index",
+      "handler": "board.find",
       "config": {
         "policies": []
       }
     },
     {
       "method": "GET",
-      "path": "/:bbid",
+      "path": "/count",
+      "handler": "board.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/:id",
+      "handler": "board.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/",
+      "handler": "board.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/:id",
+      "handler": "board.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/:id",
+      "handler": "board.delete",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/bboards/:bid",
       "handler": "bboard.find",
       "config": {
         "policies": []
@@ -18,7 +58,7 @@
     },
     {
       "method": "GET",
-      "path": "/:bbid/count",
+      "path": "/bboards/:bid/count",
       "handler": "bboard.count",
       "config": {
         "policies": []
@@ -26,7 +66,7 @@
     },
     {
       "method": "GET",
-      "path": "/:bbid/:id",
+      "path": "/bboards/:bid/:id",
       "handler": "bboard.findOne",
       "config": {
         "policies": []
@@ -34,7 +74,7 @@
     },
     {
       "method": "POST",
-      "path": "/:bbid",
+      "path": "/bboards/:bid",
       "handler": "bboard.create",
       "config": {
         "policies": []
@@ -42,7 +82,7 @@
     },
     {
       "method": "PUT",
-      "path": "/:bbid/:id",
+      "path": "/bboards/:bid/:id",
       "handler": "bboard.update",
       "config": {
         "policies": []
@@ -50,7 +90,7 @@
     },
     {
       "method": "DELETE",
-      "path": "/:bbid/:id",
+      "path": "/bboards/:bid/:id",
       "handler": "bboard.delete",
       "config": {
         "policies": []
@@ -58,7 +98,7 @@
     },
     {
       "method": "GET",
-      "path": "/:bbid/:pid/replies",
+      "path": "/bboards/:bid/:pid/replies",
       "handler": "bboard.find",
       "config": {
         "policies": []
@@ -66,7 +106,7 @@
     },
     {
       "method": "GET",
-      "path": "/:bbid/:pid/count",
+      "path": "/bboards/:bid/:pid/count",
       "handler": "bboard.count",
       "config": {
         "policies": []
@@ -74,7 +114,7 @@
     },
     {
       "method": "POST",
-      "path": "/:bbid/:pid",
+      "path": "/bboards/:bid/:pid",
       "handler": "bboard.create",
       "config": {
         "policies": []

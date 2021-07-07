@@ -4,11 +4,13 @@
   "private": true,
   "description": "This is the description of the plugin.",
   "strapi": {
-    "name": "bulletin-board",
+    "name": "bulletin-boards",
     "icon": "plug",
-    "description": "Description of bulletin-board plugin."
+    "description": "Description of bulletin-boards plugin."
   },
-  "dependencies": {},
+  "dependencies": {
+    "@sindresorhus/slugify": "1.1.0"
+  },
   "author": {
     "name": "A Strapi developer",
     "email": "tiglek@gmail.com",

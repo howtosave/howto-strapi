@@ -11,6 +11,11 @@
     "comment": "bulletin board"
   },
   "attributes": {
+    "bid": {
+      "model": "board",
+      "plugin": "bulletin-boards",
+      "required": true
+    },
     "type": {
       "type": "enumeration",
       "enum": ["article", "reply"]

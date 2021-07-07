@@ -4,27 +4,51 @@
 ##
 
 @BASE_URL = http://localhost:1337
-@bbid = bboard
 
 # GET /bulletin-boards
 GET {{BASE_URL}}/bulletin-boards HTTP/1.1
 
 ###
 
-# GET /bulletin-boards/:bbid
+# GET /count
+GET {{BASE_URL}}/bulletin-boards/count HTTP/1.1
+
+###
+
+# create a board
+# POST /
+# @name createBoard
+POST {{BASE_URL}}/bulletin-boards HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "board-2",
+  "allowReply": true
+}
+###
+@bbid = {{createBoard.response.body.id}}
+
+# GET /bulletin-boards/:id
 GET {{BASE_URL}}/bulletin-boards/{{bbid}} HTTP/1.1
 
 ###
 
+# find articles
+# GET /bboards/:bbid
+GET {{BASE_URL}}/bulletin-boards/bboards/{{bbid}} HTTP/1.1
+
+###
+
 # article count
-# GET /bulletin-boards/:bbid/count
-GET {{BASE_URL}}/bulletin-boards/{{bbid}}/count HTTP/1.1
+# GET /bboards/:bbid/count
+GET {{BASE_URL}}/bulletin-boards/bboards/{{bbid}}/count HTTP/1.1
 
 ###
 
 # create an article
+# POST /bboards/:bbid
 # @name createArticle
-POST {{BASE_URL}}/bulletin-boards/{{bbid}} HTTP/1.1
+POST {{BASE_URL}}/bulletin-boards/bboards/{{bbid}} HTTP/1.1
 Content-Type: application/json
 
 {
@@ -34,7 +58,8 @@ Content-Type: application/json
 ###
 
 # update an article
-PUT {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
+# PUT /bboards/:bbid/:id
+PUT {{BASE_URL}}/bulletin-boards/bboards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
 Content-Type: application/json
 
 {
@@ -44,8 +69,9 @@ Content-Type: application/json
 ###
 
 # create a reply to the article
+# POST /bboards/:bbid/:pid
 # @name createReply
-POST {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
+POST {{BASE_URL}}/bulletin-boards/bboards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
 Content-Type: application/json
 
 {
@@ -55,7 +81,8 @@ Content-Type: application/json
 ###
 
 # update a reply
-PUT {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
+# PUT /bboards/:bbid/:id
+PUT {{BASE_URL}}/bulletin-boards/bboards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
 Content-Type: application/json
 
 {
@@ -65,7 +92,8 @@ Content-Type: application/json
 ###
 
 # create a reply to the reply
-POST {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
+# POST /bboards/:bbid/:pid
+POST {{BASE_URL}}/bulletin-boards/bboards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
 Content-Type: application/json
 
 {
@@ -75,17 +103,19 @@ Content-Type: application/json
 ###
 
 # reply count
-# GET /bulletin-boards/:bbid/:pid/count
-GET {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createArticle.response.body.id}}/count HTTP/1.1
+# GET /bboards/:bbid/:pid/count
+GET {{BASE_URL}}/bulletin-boards/bboards/{{bbid}}/{{createArticle.response.body.id}}/count HTTP/1.1
 
 ###
 
 # delete an article
-DELETE {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
+# DELETE /bboards/:bbid/:id
+DELETE {{BASE_URL}}/bulletin-boards/bboards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
 
 ###
 
 # delete a reply
-DELETE {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
+# DELETE /bboards/:bbid/:id
+DELETE {{BASE_URL}}/bulletin-boards/bboards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
 
 ###
