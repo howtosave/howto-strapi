@@ -10,10 +10,10 @@ const { ObjectId } = require("mongoose").Types;
 
 const { isObjectId } = require("my-api-utils");
 
-const _cores = (name = "bboard") => ({
-  query: strapi.query(name), // Util functions for database query
-  model: strapi.query(name).model, // To access the underlying ORM model.
-  service: strapi.services[name], // Service functions
+const _cores = (name = "bboard", plugin = "bulletin-boards") => ({
+  query: strapi.query(name, plugin), // Util functions for database query
+  model: strapi.query(name, plugin).model, // To access the underlying ORM model.
+  service: strapi.plugins[plugin].services[name], // Service functions
 });
 
 const bbidInfo = {
@@ -53,9 +53,9 @@ module.exports = {
 
     let entities;
     if (queryParams._q) {
-      entities = await _cores(bbid).service.search(queryParams);
+      entities = await _cores(bbid).query.search(queryParams);
     } else {
-      entities = await _cores(bbid).service.find(queryParams);
+      entities = await _cores(bbid).query.find(queryParams);
     }
     return ctx.send(entities);
   },
@@ -72,7 +72,7 @@ module.exports = {
       // {"statusCode":400,"error":"Bad Request","message":"Invalid id:..."}
     }
 
-    const entity = await _cores(bbid).service.findOne({ id });
+    const entity = await _cores(bbid).query.findOne({ id });
     if (!entity) {
       return ctx.badRequest(`Not found: ${id}`);
     }
@@ -103,9 +103,9 @@ module.exports = {
     }
 
     if (queryParams._q) {
-      return _cores(bbid).service.countSearch(queryParams);
+      return _cores(bbid).query.countSearch(queryParams);
     }
-    return _cores(bbid).service.count(queryParams);
+    return _cores(bbid).query.count(queryParams);
   },
 
   async create(ctx) {
@@ -167,7 +167,7 @@ module.exports = {
       return ctx.badRequest(`Invalid id`);
     }
     const { title, content } = ctx.request.body;
-    let entity = await _cores(bbid).service.update({ id }, { title, content });
+    let entity = await _cores(bbid).query.update({ id }, { title, content });
     if (!entity) {
       // N.B.
       // This block never be called.
@@ -187,7 +187,7 @@ module.exports = {
     if (!id || !isObjectId(id)) {
       return ctx.badRequest(`Invalid id`);
     }
-    let entity = await _cores(bbid).service.delete({ id });
+    let entity = await _cores(bbid).query.delete({ id });
     if (!entity) {
       return ctx.badRequest(`Not found: ${id}`);
     }

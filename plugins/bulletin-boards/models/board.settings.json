@@ -1,14 +1,15 @@
 {
-  "collectionName": "bulletin_boards",
+  "collectionName": "bulletin-boards_board",
   "info": {
-    "name": "bulletin-board",
-    "description": "Bulletin Board"
+    "name": "board",
+    "description": "Board"
   },
   "options": {
-    "draftAndPublish": true,
+    "draftAndPublish": false,
+    "populateCreatorFields": false,
     "increments": true,
     "timestamps": true,
-    "comment": "bulletin board"
+    "comment": "board"
   },
   "attributes": {
     "name": {

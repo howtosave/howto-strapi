@@ -1,0 +1,91 @@
+
+##
+## Authentication
+##
+
+@BASE_URL = http://localhost:1337
+@bbid = bboard
+
+# GET /bulletin-boards
+GET {{BASE_URL}}/bulletin-boards HTTP/1.1
+
+###
+
+# GET /bulletin-boards/:bbid
+GET {{BASE_URL}}/bulletin-boards/{{bbid}} HTTP/1.1
+
+###
+
+# article count
+# GET /bulletin-boards/:bbid/count
+GET {{BASE_URL}}/bulletin-boards/{{bbid}}/count HTTP/1.1
+
+###
+
+# create an article
+# @name createArticle
+POST {{BASE_URL}}/bulletin-boards/{{bbid}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "1",
+  "content": "a"
+}
+###
+
+# update an article
+PUT {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "1 updated",
+  "content": "a updated"
+}
+###
+
+# create a reply to the article
+# @name createReply
+POST {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "1-1",
+  "content": "a-1"
+}
+###
+
+# update a reply
+PUT {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "1-1 updated",
+  "content": "a-1 updated"
+}
+###
+
+# create a reply to the reply
+POST {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "1-1-1",
+  "content": "a-1-1"
+}
+###
+
+# reply count
+# GET /bulletin-boards/:bbid/:pid/count
+GET {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createArticle.response.body.id}}/count HTTP/1.1
+
+###
+
+# delete an article
+DELETE {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createArticle.response.body.id}} HTTP/1.1
+
+###
+
+# delete a reply
+DELETE {{BASE_URL}}/bulletin-boards/{{bbid}}/{{createReply.response.body.id}} HTTP/1.1
+
+###

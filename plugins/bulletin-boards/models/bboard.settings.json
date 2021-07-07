@@ -1,14 +1,14 @@
 {
-  "collectionName": "nboards",
+  "collectionName": "bulletin-boards_bboard",
   "info": {
-    "name": "nboard",
-    "description": "Notice Board"
+    "name": "bboard",
+    "description": "Bulletin Board"
   },
   "options": {
     "draftAndPublish": true,
     "increments": true,
     "timestamps": true,
-    "comment": "notice board"
+    "comment": "bulletin board"
   },
   "attributes": {
     "type": {
@@ -23,10 +23,11 @@
     },
     "allowReply": {
       "type": "boolean",
-      "default": false
+      "default": true
     },
     "replies": {
-      "collection": "bboard"
+      "collection": "bboard",
+      "plugin": "bulletin-boards"
     },
     "user": {
       "model": "user",
