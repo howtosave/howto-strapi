@@ -1,0 +1,36 @@
+{
+  "collectionName": "bboards",
+  "info": {
+    "name": "bboard",
+    "description": "Bulletin Board"
+  },
+  "options": {
+    "draftAndPublish": true,
+    "increments": true,
+    "timestamps": true,
+    "comment": "bulletin board"
+  },
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": ["article", "reply"]
+    },
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "allowReply": {
+      "type": "boolean",
+      "default": true
+    },
+    "replies": {
+      "collection": "bboard"
+    },
+    "user": {
+      "model": "user",
+      "plugin": "users-permissions"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "collectionName": "bulletin_boards",
+  "info": {
+    "name": "bulletin-board",
+    "description": "Bulletin Board"
+  },
+  "options": {
+    "draftAndPublish": true,
+    "increments": true,
+    "timestamps": true,
+    "comment": "bulletin board"
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "bid": {
+      "type": "string"
+    },
+    "allowReply": {
+      "type": "boolean",
+      "default": true
+    },
+    "owner": {
+      "model": "user",
+      "plugin": "users-permissions"
+    },
+    "members": {
+      "collection": "user",
+      "plugin": "users-permissions"
+    }
+  }
+}
