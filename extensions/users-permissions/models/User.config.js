@@ -19,6 +19,12 @@ module.exports = {
       ],
       [
         {
+          name: 'picture',
+          size: 6,
+        },
+      ],
+      [
+        {
           name: 'confirmed',
           size: 4,
         },
