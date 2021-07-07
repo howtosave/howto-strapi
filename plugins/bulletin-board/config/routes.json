@@ -1,0 +1,76 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/bulletin-boards/:bbid",
+      "handler": "bboard.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/bulletin-boards/:bbid/count",
+      "handler": "bboard.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/bulletin-boards/:bbid/:id",
+      "handler": "bboard.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bulletin-boards/:bbid",
+      "handler": "bboard.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/bulletin-boards/:bbid/:id",
+      "handler": "bboard.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/bulletin-boards/:bbid/:id",
+      "handler": "bboard.delete",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/bulletin-boards/:bbid/:pid/replies",
+      "handler": "bboard.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/bulletin-boards/:bbid/:pid/count",
+      "handler": "bboard.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bulletin-boards/:bbid/:pid",
+      "handler": "bboard.create",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
