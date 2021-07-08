@@ -35,7 +35,7 @@ GET {{BASE_URL}}/bulletin-boards/boards/{{bbid}} HTTP/1.1
 
 # find articles
 # GET /posts/:bbid
-GET {{BASE_URL}}/bulletin-boards/posts/ HTTP/1.1
+GET {{BASE_URL}}/bulletin-boards/posts/{{bbid}}?_start=1&_limit=5 HTTP/1.1
 
 ###
 

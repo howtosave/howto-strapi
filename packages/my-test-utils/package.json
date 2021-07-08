@@ -1,0 +1,21 @@
+{
+  "name": "my-test-utils",
+  "version": "1.0.0",
+  "description": "Utils for testing",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "perf:get": "node ./perf-test http://127.0.0.1:1337 get",
+    "perf:post": "node ./perf-test http://127.0.0.1:1337 post",
+    "perf:get:dev": "node ./perf-test https://dev.joyfun.kr get",
+    "perf:post:dev": "node ./perf-test https://dev.joyfun.kr post"
+  },
+  "author": "",
+  "devDependencies": {
+    "loadtest": "*",
+    "lodash": "^4.17.15"
+  },
+  "bin": {
+    "gen-data": "./bin/gen.js"
+  }
+}

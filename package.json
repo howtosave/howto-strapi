@@ -64,7 +64,7 @@
   },
   "license": "MIT",
   "workspaces": [
-    "packages/my-api-utils",
+    "packages/*",
 
     "strapi/packages/create-strapi-app",
     "strapi/packages/create-strapi-starter",
