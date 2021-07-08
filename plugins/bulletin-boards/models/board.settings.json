@@ -4,6 +4,14 @@
     "name": "board",
     "description": "Board"
   },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": true
+    },
+    "content-type-builder": {
+      "visible": true
+    }
+  },
   "options": {
     "draftAndPublish": false,
     "populateCreatorFields": false,
