@@ -10,7 +10,7 @@ const { ObjectId } = require("mongoose").Types;
 
 const { isObjectId } = require("my-api-utils");
 
-const _cores = (name = "bboard", plugin = "bulletin-boards") => ({
+const _cores = (name = "post", plugin = "bulletin-boards") => ({
   query: strapi.query(name, plugin), // Util functions for database query
   model: strapi.query(name, plugin).model, // To access the underlying ORM model.
   service: strapi.plugins[plugin].services[name], // Service functions

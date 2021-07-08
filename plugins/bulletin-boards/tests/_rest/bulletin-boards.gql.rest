@@ -44,7 +44,7 @@ Content-Type: application/json
 X-REQUEST-TYPE: GraphQL
 
 query GetArticles($bid: ID) {
-  bboards(where: {bid: $bid, type:"article"}) { 
+  posts(where: {bid: $bid, type:"article"}) { 
     id title replies { id replies { id } }
   }
 }
@@ -55,7 +55,7 @@ query GetArticles($bid: ID) {
 ###
 
 # article id
-@aid = {{GetArticles.response.body.data.bboards[0].id}}
+@aid = {{GetArticles.response.body.data.posts[0].id}}
 
 # GetArticle
 POST {{BASE_URL}}
@@ -63,7 +63,7 @@ Content-Type: application/json
 X-REQUEST-TYPE: GraphQL
 
 query GetArticle($id: ID!, $bid: ID!) {
-  bboardWithBid(id: $id, bid: $bid) { 
+  postWithBid(id: $id, bid: $bid) { 
     title
   }
 }

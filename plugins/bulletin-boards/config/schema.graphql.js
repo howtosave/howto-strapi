@@ -1,14 +1,14 @@
 module.exports = {
   definition: ``,
   query: `
-    bboardWithBid(id: ID!, bid: ID!, publicationState: PublicationState): BulletinBoardsBboard
+    postWithBid(id: ID!, bid: ID!, publicationState: PublicationState): BulletinBoardsPost
   `,
   type: {},
   resolver: {
     Query: {
-      bboardWithBid: {
+      postWithBid: {
         description: "",
-        resolver: "plugins::bulletin-boards.bboard.findOne",
+        resolver: "plugins::bulletin-boards.post.findOne",
       }
     },
   },

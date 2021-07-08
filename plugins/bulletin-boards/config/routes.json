@@ -50,72 +50,72 @@
     },
     {
       "method": "GET",
-      "path": "/bboards/:bid",
-      "handler": "bboard.find",
+      "path": "/posts/:bid",
+      "handler": "post.find",
       "config": {
         "policies": []
       }
     },
     {
       "method": "GET",
-      "path": "/bboards/:bid/count",
-      "handler": "bboard.count",
+      "path": "/posts/:bid/count",
+      "handler": "post.count",
       "config": {
         "policies": []
       }
     },
     {
       "method": "GET",
-      "path": "/bboards/:bid/:id",
-      "handler": "bboard.findOne",
+      "path": "/posts/:bid/:id",
+      "handler": "post.findOne",
       "config": {
         "policies": []
       }
     },
     {
       "method": "POST",
-      "path": "/bboards/:bid",
-      "handler": "bboard.create",
+      "path": "/posts/:bid",
+      "handler": "post.create",
       "config": {
         "policies": []
       }
     },
     {
       "method": "PUT",
-      "path": "/bboards/:bid/:id",
-      "handler": "bboard.update",
+      "path": "/posts/:bid/:id",
+      "handler": "post.update",
       "config": {
         "policies": []
       }
     },
     {
       "method": "DELETE",
-      "path": "/bboards/:bid/:id",
-      "handler": "bboard.delete",
+      "path": "/posts/:bid/:id",
+      "handler": "post.delete",
       "config": {
         "policies": []
       }
     },
     {
       "method": "GET",
-      "path": "/bboards/:bid/:pid/replies",
-      "handler": "bboard.find",
+      "path": "/posts/:bid/:pid/replies",
+      "handler": "post.find",
       "config": {
         "policies": []
       }
     },
     {
       "method": "GET",
-      "path": "/bboards/:bid/:pid/count",
-      "handler": "bboard.count",
+      "path": "/posts/:bid/:pid/count",
+      "handler": "post.count",
       "config": {
         "policies": []
       }
     },
     {
       "method": "POST",
-      "path": "/bboards/:bid/:pid",
-      "handler": "bboard.create",
+      "path": "/posts/:bid/:pid",
+      "handler": "post.create",
       "config": {
         "policies": []
       }

@@ -1,14 +1,14 @@
 {
-  "collectionName": "bulletin-boards_bboard",
+  "collectionName": "bulletin-boards_post",
   "info": {
-    "name": "bboard",
-    "description": "Bulletin Board"
+    "name": "board-post",
+    "description": "Post of Bulletin Board"
   },
   "options": {
     "draftAndPublish": true,
     "increments": true,
     "timestamps": true,
-    "comment": "bulletin board"
+    "comment": "post of bulletin board"
   },
   "attributes": {
     "bid": {
@@ -31,7 +31,7 @@
       "default": true
     },
     "replies": {
-      "collection": "bboard",
+      "collection": "post",
       "plugin": "bulletin-boards"
     },
     "user": {
