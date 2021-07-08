@@ -1,0 +1,84 @@
+
+##
+## Authentication
+##
+
+@BASE_URL = http://localhost:1337/graphql
+
+# GetBoards
+# @name GetBoards
+POST {{BASE_URL}}
+Content-Type: application/json
+X-REQUEST-TYPE: GraphQL
+
+query GetBoards {
+  boards {
+    id
+  }
+}
+###
+
+# board id
+@bid = {{GetBoards.response.body.data.boards[0].id}}
+
+# GetBoard
+POST {{BASE_URL}}
+Content-Type: application/json
+X-REQUEST-TYPE: GraphQL
+
+query GetBoard($id: ID!) {
+  board(id: $id) {
+  	name
+  }
+}
+
+{
+  "id": "{{bid}}"
+}
+###
+
+# GetArticles
+# @name GetArticles
+POST {{BASE_URL}}
+Content-Type: application/json
+X-REQUEST-TYPE: GraphQL
+
+query GetArticles($bid: ID) {
+  bboards(where: {bid: $bid, type:"article"}) { 
+    id title replies { id replies { id } }
+  }
+}
+
+{
+  "bid": "{{bid}}"
+}
+###
+
+# article id
+@aid = {{GetArticles.response.body.data.bboards[0].id}}
+
+# GetArticle
+POST {{BASE_URL}}
+Content-Type: application/json
+X-REQUEST-TYPE: GraphQL
+
+query GetArticle($id: ID!, $bid: ID!) {
+  bboardWithBid(id: $id, bid: $bid) { 
+    title
+  }
+}
+
+{
+  "id": "{{aid}}",
+  "bid": "{{bid}}"
+}
+###
+
+# TMPL
+POST {{BASE_URL}}
+Content-Type: application/json
+X-REQUEST-TYPE: GraphQL
+
+query {
+}
+###

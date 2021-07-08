@@ -21,10 +21,14 @@ const isValidBId = (id) => isObjectId(id);
 module.exports = {
   async find(ctx) {
     const { query: queryParams } = ctx;
-    const { bid, pid } = ctx.params;
-
-    if (!isValidBId(bid)) return ctx.badRequest(`Invalid bid`);
-    queryParams.bid = bid;
+    const { pid } = ctx.params;
+    // ctx.params.bid is valid from REST request
+    // ctx.query.bid is valid from GraphQL request
+    const bid = ctx.params.bid ? ctx.params.bid : queryParams.bid;
+    if (bid) {
+      if (!isValidBId(bid)) return ctx.badRequest(`Invalid bid`);
+      queryParams.bid = bid;
+    }
 
     if (pid) {
       if (!isObjectId(pid)) {
@@ -52,7 +56,13 @@ module.exports = {
   },
 
   async findOne(ctx) {
-    const { bid, id } = ctx.params;
+    const { id } = ctx.params;
+    // ctx.params.bid is valid from REST request
+    // ctx.params._bid is valid from GraphQL request
+    const bid = ctx.params.bid || ctx.params._bid;
+
+    console.log("query params:", ctx.query);
+    console.log("path params:", ctx.params);
 
     if (!isValidBId(bid)) return ctx.badRequest(`Invalid bid`);
 

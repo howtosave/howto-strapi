@@ -6,36 +6,36 @@
 @BASE_URL = http://localhost:1337
 
 # GET /bulletin-boards
-GET {{BASE_URL}}/bulletin-boards HTTP/1.1
+GET {{BASE_URL}}/bulletin-boards/boards HTTP/1.1
 
 ###
 
 # GET /count
-GET {{BASE_URL}}/bulletin-boards/count HTTP/1.1
+GET {{BASE_URL}}/bulletin-boards/boards/count HTTP/1.1
 
 ###
 
 # create a board
 # POST /
 # @name createBoard
-POST {{BASE_URL}}/bulletin-boards HTTP/1.1
+POST {{BASE_URL}}/bulletin-boards/boards HTTP/1.1
 Content-Type: application/json
 
 {
-  "name": "board-2",
+  "name": "board-1",
   "allowReply": true
 }
 ###
 @bbid = {{createBoard.response.body.id}}
 
 # GET /bulletin-boards/:id
-GET {{BASE_URL}}/bulletin-boards/{{bbid}} HTTP/1.1
+GET {{BASE_URL}}/bulletin-boards/boards/{{bbid}} HTTP/1.1
 
 ###
 
 # find articles
 # GET /bboards/:bbid
-GET {{BASE_URL}}/bulletin-boards/bboards/{{bbid}} HTTP/1.1
+GET {{BASE_URL}}/bulletin-boards/bboards/ HTTP/1.1
 
 ###
 
