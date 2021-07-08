@@ -2,7 +2,7 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/",
+      "path": "/boards",
       "handler": "board.find",
       "config": {
         "policies": []
@@ -10,7 +10,7 @@
     },
     {
       "method": "GET",
-      "path": "/count",
+      "path": "/boards/count",
       "handler": "board.count",
       "config": {
         "policies": []
@@ -18,7 +18,7 @@
     },
     {
       "method": "GET",
-      "path": "/:id",
+      "path": "/boards/:id",
       "handler": "board.findOne",
       "config": {
         "policies": []
@@ -26,7 +26,7 @@
     },
     {
       "method": "POST",
-      "path": "/",
+      "path": "/boards",
       "handler": "board.create",
       "config": {
         "policies": []
@@ -34,7 +34,7 @@
     },
     {
       "method": "PUT",
-      "path": "/:id",
+      "path": "/boards/:id",
       "handler": "board.update",
       "config": {
         "policies": []
@@ -42,7 +42,7 @@
     },
     {
       "method": "DELETE",
-      "path": "/:id",
+      "path": "/boards/:id",
       "handler": "board.delete",
       "config": {
         "policies": []
