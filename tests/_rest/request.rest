@@ -4,8 +4,8 @@
 ##
 
 ## existing user
-@email = _test001_@local.host
-@password = _test001_483184
+@email = test001@local.host
+@password = test000
 
 @BASE_URL = http://localhost:1337
 

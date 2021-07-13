@@ -30,4 +30,3 @@ Percentage of the requests served within a certain time
   99%      15073 ms
  100%      15199 ms (longest request)
 ```
-
