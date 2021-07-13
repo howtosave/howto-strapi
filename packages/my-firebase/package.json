@@ -10,7 +10,9 @@
     "test": "jest ./lib"
   },
   "author": "",
-  "dependencies": {},
+  "dependencies": {
+    "firebase-admin": "~9.10.0"
+  },
   "devDependencies": {
     "@types/jest": "~26.0.24",
     "@types/node": "~16.3.1",

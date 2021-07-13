@@ -4,23 +4,23 @@ module.exports = {
       [
         {
           name: 'email',
-          size: 6,
+          size: 4,
         },
         {
           name: 'username',
-          size: 6,
+          size: 4,
         },
       ],
       [
         {
           name: 'password',
-          size: 6,
+          size: 4,
         },
       ],
       [
         {
           name: 'picture',
-          size: 6,
+          size: 4,
         },
       ],
       [
