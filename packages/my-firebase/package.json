@@ -1,0 +1,22 @@
+{
+  "name": "my-firebase",
+  "version": "1.0.0",
+  "description": "Utils for firebase",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dist": "tsc --build",
+    "dist:clean": "rm -rf ./dist",
+    "test": "jest ./lib"
+  },
+  "author": "",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "~26.0.24",
+    "@types/node": "~16.3.1",
+    "jest": "*",
+    "ts-jest": "~27.0.3",
+    "ts-node": "~10.1.0",
+    "typescript": "~4.3.5"
+  }
+}
