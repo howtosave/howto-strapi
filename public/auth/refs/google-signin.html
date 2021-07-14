@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Google Sign-In</title>
+    <!--
+      Client ID from OAuth 2.0 Client ID in Google Developers Console(https://console.cloud.google.com/apis/credentials)
+    -->
+    <meta
+      name="google-signin-client_id"
+      content="491504323842-btkfj4ml367lr0slo5hqu2no7o8033kq.apps.googleusercontent.com"
+    />
+    <style></style>
+  </head>
+  <body>
+    <!-- Login button -->
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+    <!-- Sign out button-->
+    <a href="#" onclick="signOut();">Sign out</a>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+      function onSignIn(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+      }
+      function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+          console.log('User signed out.');
+        });
+      }
+    </script>
+  </body>
+</html>
