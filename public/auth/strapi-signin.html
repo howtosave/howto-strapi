@@ -1,0 +1,168 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Strapi Signin using React</title>
+
+    <!-- Load React. -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+
+    <!-- axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  </head>
+  <body>
+
+    <!-- SignIn Button -->
+    <div id="root_container">
+      <div id="strapi_signin_button_container" data-authstate="signout"></div>
+      <div id="strapi_signup_button_container"></div>
+    </div>
+
+    <script src="./strapi-auth.js"></script>
+
+<script>
+//
+// React Utils
+//
+var _reactElementCounter = 0;
+var _reactElements = {};
+
+//
+// attribute update listener
+//
+var _reactElementObserver = new MutationObserver(function(mutations, observer) {
+  mutations.forEach(function(mutation) {
+    if (mutation.type == "attributes") {
+      renderReactElement(null, mutation.target);
+    }
+  });
+});
+
+//
+// element renderer
+//
+function renderReactElement(ele, container) {
+  container = typeof container === "string" ? document.getElementById(container) : container;
+
+  if (!ele) {
+    ele = _reactElements[container.dataset.__id];
+  } else {
+    const eleId = "" + _reactElementCounter++;
+    _reactElements[eleId] = ele;
+    container.dataset.__id = eleId;
+    //
+    _reactElementObserver.observe(container, {
+      attributes: true //configure it to listen to attribute changes
+    });
+  }
+
+  const props = Object.keys(container.dataset).reduce((acc, e) => { if (e !== "__id") acc[e] = container.dataset[e]; return acc; }, {});
+  ReactDOM.render(
+    React.createElement(ele, props, null),
+    container
+  );
+}
+
+//
+// See JSX Online browser: https://babeljs.io/repl/
+//
+class SignInButton extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() { console.log(">>>", this.props.authstate);
+    return React.createElement(
+      'button',
+      { onClick: () => signInToggle() },
+      this.props.authstate === "signout" ? 'Login' : "Logout"
+    );
+  }
+}
+
+class SignUpButton extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return React.createElement(
+      'button',
+      { onClick: () => signUp() },
+      'Sign Up'
+    );
+  }
+}
+
+renderReactElement(SignInButton, 'strapi_signin_button_container');
+renderReactElement(SignUpButton, 'strapi_signup_button_container');
+
+</script>
+
+
+<script>
+
+var strapiAuth = new StrapiAuth("http://localhost:1337");
+
+function updateAuthUi(loggedIn) {
+  if (loggedIn) {
+    document.getElementById("strapi_signin_button_container").dataset["authstate"] = "signin";
+    document.getElementById("strapi_signup_button_container").style.display = "none";
+  }
+  else {
+    document.getElementById("strapi_signin_button_container").dataset["authstate"] = "signout";
+    document.getElementById("strapi_signup_button_container").style.display = "block";
+  }
+}
+
+function signInToggle() {
+  if (!strapiAuth.getUser())
+    return signIn();
+  else
+    return signOut();
+}
+
+async function signIn() {
+  if (strapiAuth.getUser()) {
+    console.log("already sign-in...");
+    return;
+  }
+  console.log("try to sign-in...");
+
+  const res = await strapiAuth.login("test001@local.host", "test000");
+  if (res.status === 200) {
+    console.log(res);
+    updateAuthUi(true);
+  }
+}
+
+function signOut() {
+  if (!strapiAuth.getUser()) {
+    console.log("already sign-out...");
+    return;
+  }
+  console.log("try to sign-out...");
+
+  strapiAuth.logout();
+  updateAuthUi(false);
+}
+
+async function signUp() {
+  if (strapiAuth.getUser()) {
+    console.log("already sign-in...");
+    return;
+  }
+  console.log("try to sign-up...");
+
+  const res = await strapiAuth.register("test001@local.host", "test000", "test001");
+  console.log(res);
+  if (res.status === 200) {
+    updateAuthUi(true);
+  }
+}
+
+</script>
+  </body>
+</html>
