@@ -8,4 +8,8 @@
  * run jobs, or perform some special logic.
  */
 
-module.exports = () => {};
+const { credentialInfoFromEnv, initFirebaseApp } = require("my-firebase");
+
+module.exports = () => {
+  strapi.firebase = initFirebaseApp({ credential: credentialInfoFromEnv(process.env) });
+};

@@ -9,6 +9,7 @@
 /* eslint-disable no-useless-escape */
 const _ = require('lodash');
 const { sanitizeEntity } = require('strapi-utils');
+const firebase = require('my-firebase');
 
 const emailRegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const formatError = error => [
@@ -287,9 +288,23 @@ module.exports = {
       if (!settings.email_confirmation) {
         params.confirmed = true;
       }
-      // 1. create firebase user instance
-      // 
       const user = await strapi.query('user', 'users-permissions').create(params);
+
+      try {
+        // create firebase user instance with user._id
+        const fbuser = await firebase.createUser({
+          uid: user.id,
+          email: user.email,
+          emailVerified: params.confirmed,
+          password: params.password,
+          displayName: user.username,
+          phothUrl: "",
+          disabled: false,
+        });
+      } catch (e) {
+        console.error("!!! Error while creating firebase user:", e.code, e.message);
+        return ctx.badRequest(null, e);
+      }
 
       const sanitizedUser = sanitizeEntity(user, {
         model: strapi.query('user', 'users-permissions').model,
