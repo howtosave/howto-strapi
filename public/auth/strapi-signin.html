@@ -16,58 +16,36 @@
 
     <!-- SignIn Button -->
     <div id="root_container">
+      <div id="strapi_request_button_container" data-state="done"></div>
       <div id="strapi_signin_button_container" data-authstate="signout"></div>
       <div id="strapi_signup_button_container"></div>
     </div>
 
-    <script src="./strapi-auth.js"></script>
+    <script src="./lib/strapi-api.js"></script>
+    <script src="./lib/react-utils.js"></script>
 
 <script>
 //
-// React Utils
-//
-var _reactElementCounter = 0;
-var _reactElements = {};
-
-//
-// attribute update listener
-//
-var _reactElementObserver = new MutationObserver(function(mutations, observer) {
-  mutations.forEach(function(mutation) {
-    if (mutation.type == "attributes") {
-      renderReactElement(null, mutation.target);
-    }
-  });
-});
-
-//
-// element renderer
-//
-function renderReactElement(ele, container) {
-  container = typeof container === "string" ? document.getElementById(container) : container;
-
-  if (!ele) {
-    ele = _reactElements[container.dataset.__id];
-  } else {
-    const eleId = "" + _reactElementCounter++;
-    _reactElements[eleId] = ele;
-    container.dataset.__id = eleId;
-    //
-    _reactElementObserver.observe(container, {
-      attributes: true //configure it to listen to attribute changes
-    });
-  }
-
-  const props = Object.keys(container.dataset).reduce((acc, e) => { if (e !== "__id") acc[e] = container.dataset[e]; return acc; }, {});
-  ReactDOM.render(
-    React.createElement(ele, props, null),
-    container
-  );
-}
-
-//
 // See JSX Online browser: https://babeljs.io/repl/
 //
+class RequestButton extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() { console.log(">>>", this.props.state);
+    return React.createElement(
+      'button',
+      {
+        onClick: () => makeRequest(),
+        disabled: this.props.state !== "done",
+        style: { },
+      },
+      "Make request"
+    );
+  }
+}
+
 class SignInButton extends React.Component {
   constructor(props) {
     super(props);
@@ -98,13 +76,17 @@ class SignUpButton extends React.Component {
 
 renderReactElement(SignInButton, 'strapi_signin_button_container');
 renderReactElement(SignUpButton, 'strapi_signup_button_container');
+renderReactElement(RequestButton, 'strapi_request_button_container');
 
 </script>
 
-
 <script>
 
-var strapiAuth = new StrapiAuth("http://localhost:1337");
+var strapiApi = new StrapiApi("http://localhost:1337", "/graphql");
+
+function updateRequestUi({ requestState }) {
+  document.getElementById("strapi_request_button_container").dataset["state"] = requestState;
+}
 
 function updateAuthUi(loggedIn) {
   if (loggedIn) {
@@ -117,21 +99,39 @@ function updateAuthUi(loggedIn) {
   }
 }
 
+const useGraphql = true;
+
+async function makeRequest() {
+  updateRequestUi({ requestState: "inprogress" });
+  if (useGraphql) {
+    const res = await strapiApi.graphql(`query { noops { id } }`);
+    console.log(">>>", res);
+  }else {
+    const res = await strapiApi.request({
+      method: 'get',
+      url: `/`,
+    });
+    console.log(">>>", res);
+  }
+  updateRequestUi({ requestState: "done" });
+  //if (res.status === 200)
+}
+
 function signInToggle() {
-  if (!strapiAuth.getUser())
+  if (!strapiApi.getUser())
     return signIn();
   else
     return signOut();
 }
 
 async function signIn() {
-  if (strapiAuth.getUser()) {
+  if (strapiApi.getUser()) {
     console.log("already sign-in...");
     return;
   }
   console.log("try to sign-in...");
 
-  const res = await strapiAuth.login("test001@local.host", "test000");
+  const res = await strapiApi.login("test001@local.host", "test000");
   if (res.status === 200) {
     console.log(res);
     updateAuthUi(true);
@@ -139,24 +139,24 @@ async function signIn() {
 }
 
 function signOut() {
-  if (!strapiAuth.getUser()) {
+  if (!strapiApi.getUser()) {
     console.log("already sign-out...");
     return;
   }
   console.log("try to sign-out...");
 
-  strapiAuth.logout();
+  strapiApi.logout();
   updateAuthUi(false);
 }
 
 async function signUp() {
-  if (strapiAuth.getUser()) {
+  if (strapiApi.getUser()) {
     console.log("already sign-in...");
     return;
   }
   console.log("try to sign-up...");
 
-  const res = await strapiAuth.register("test001@local.host", "test000", "test001");
+  const res = await strapiApi.register("test001@local.host", "test000", "test001");
   console.log(res);
   if (res.status === 200) {
     updateAuthUi(true);

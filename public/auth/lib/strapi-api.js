@@ -1,23 +1,23 @@
 //
-// strapi Auth API
+// strapi API
 //
-class StrapiAuth {
-
-  constructor(baseUrl) {
-    this.request = axios.create({
+class StrapiApi {
+  constructor(baseUrl, gqlPath = "") {
+    this._request = axios.create({
       baseUrl,
       timeout: 5000,
     });
     this.user = null;
+    this.gqlPath = gqlPath;
   }
 
   _setAuth(authBody) {
     if (authBody) {
     this.user = authBody.user;
-    this.request.defaults.headers.common["Authorization"] = `Bearer ${authBody.jwt}`;
+    this._request.defaults.headers.common["Authorization"] = `Bearer ${authBody.jwt}`;
     } else {
       this.user = null;
-      this.request.defaults.headers.common["Authorization"] = "";
+      this._request.defaults.headers.common["Authorization"] = "";
     }
   }
 
@@ -33,9 +33,10 @@ class StrapiAuth {
   // login
   async login(email, password) {
     try {
-      const res = await this.request({
+      const res = await this._request({
         method: 'post',
         url: `/auth/local`,
+        headers: { 'Content-Type': 'application/json' },
         data: {
           identifier: email,
           password,
@@ -56,9 +57,10 @@ class StrapiAuth {
   // register
   async register(email, password, username) {
     try {
-      const res = await this.request({
+      const res = await this._request({
         method: 'post',
         url: `/auth/local/register`,
+        headers: { 'Content-Type': 'application/json' },
         data: {
           email,
           password,
@@ -74,5 +76,30 @@ class StrapiAuth {
 
   getUser() {
     return this.user;
+  }
+
+  async request(config) {
+    try {
+      return await this._request(config);
+    } catch (e) {
+      return this._handleException(e);
+    }
+  }
+
+  async graphql(query, variables = undefined) {
+    try {
+      const res = await this._request({
+        method: 'post',
+        url: this.gqlPath,
+        headers: { 'Content-Type': 'application/json' },
+        data: {
+          query,
+          variables,
+        },
+      });
+      return res;
+    } catch (e) {
+      return this._handleException(e);
+    }
   }
 };
