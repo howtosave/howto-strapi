@@ -16,12 +16,11 @@ module.exports = {
     "/plugins/",
     "/.tmp/",
     "/tmp/",
-    "/noop/",
     "/api/",
     "/.cache/",
     "/build/",
     "/strapi/",
-    "/tests/e2e/",
+    "/tests-e2e/",
   ],
   // A path to a module which exports an async function that is triggered once before all test suites
   globalSetup: '<rootDir>/tests/global-setup.js',

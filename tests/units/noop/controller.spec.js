@@ -32,10 +32,10 @@ const mockItemsData = [
   {
     key: `key-001`,
     keyslug: `key_001`,
-    compName: {
+    name: {
       value: `name-001`,
     },
-    compValues: [
+    values: [
       {
         __component: "noop.numvalue",
         value: 1,
@@ -71,7 +71,13 @@ async function insertTestData() {
   for (const item of mockItemsData) {
     let res;
     try {
-      res = await strapi.services["noop"].create(item);
+      const r = Math.floor(Math.random()*10000000);
+      res = await strapi.services["noop"].create({
+        ...item,
+        key: item.key + r,
+        keyslug: item.keyslug + r,
+        uid: item.uid + r,
+      });
     } catch (e) {
       if (e.code === 11000) { // duplicate key error
         res = await strapi.services['noop'].findOne({key: item.key});
@@ -102,20 +108,18 @@ describe("# Noop", () => {
   let mockItems;
   let mockUsers;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     const res = await getTestUsers(controllerPermissions);
     mockUsers = res.mockUsers;
     // insert data
     mockItems = await insertTestData();
-    done();
   });
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await deleteTestUsers();
-    done();
   });
 
-  it.skip("Should return 200 for HEAD request", async (done) => {
+  it("Should return 200 for HEAD request", async () => {
     await head("/noop/model")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .expect(200);
@@ -125,32 +129,29 @@ describe("# Noop", () => {
     await head(`/noop/model/${mockItems[0].id}`)
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .expect(200);
-    done();
   });
 
-  it("Should return valid response for GET /noop/model/count", async (done) => {
+  it("Should return valid response for GET /noop/model/count", async () => {
     await get("/noop/model/count")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
         expect(res.status).toBe(200);
-        expect(res.body >= mockItemsData.length).toBeTruthy();
+        expect(res.body >= mockItems.length).toBeTruthy();
       });
-    done();
   });
 
-  it("Should return valid response for GET /noop/model/count?{searchQuery}", async (done) => {
-    await get(`/noop/model/count?key_eq=${mockItemsData[0].key}`)
+  it("Should return valid response for GET /noop/model/count?{searchQuery}", async () => {
+    await get(`/noop/model/count?key_eq=${mockItems[0].key}`)
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
         expect(res.status).toBe(200);
         expect(res.body).toBe(1);
       });
-    done();
   });
 
-  it("Should return valid response for GET /noop/model", async (done) => {
+  it("Should return valid response for GET /noop/model", async () => {
     await get("/noop/model")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
@@ -158,21 +159,19 @@ describe("# Noop", () => {
         expect(res.status).toBe(200);
         expect(res.body.length >= mockItems.length).toBeTruthy();
       });
-    done();
   });
 
-  it("Should return valid response for GET /noop/model?{searchQuery}", async (done) => {
-    await get(`/noop/model?key_eq=${mockItemsData[0].key}`)
+  it("Should return valid response for GET /noop/model?{searchQuery}", async () => {
+    await get(`/noop/model?key_eq=${mockItems[0].key}`)
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
         expect(res.status).toBe(200);
-        expect(res.body.length == 1).toBeTruthy();
+        expect(res.body.length).toBe(1);
       });
-    done();
   });
 
-  it("Should return valid response for GET /noop/model/:id", async (done) => {
+  it("Should return valid response for GET /noop/model/:id", async () => {
     const item = mockItems[0];
     await get(`/noop/model/${item.id}`)
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
@@ -182,15 +181,14 @@ describe("# Noop", () => {
         expect(res.status).toBe(200);
         expect(res.body.key).toBe(item.key);
       });
-    done();
   });
 
-  it("Should return valid response for POST /noop/model", async (done) => {
+  it("Should return valid response for POST /noop/model", async () => {
     const createInput = {
       ...mockItemsData[0],
       key: mockItemsData[0].key + "_new", // <== has unique props
       keyslug: mockItemsData[0].keyslug + "_new", // <== slug must be unique
-      uid: mockItemsData[0].uid + "_aaa", // <== uid must be unique
+      uid: mockItemsData[0].uid + "_new", // <== uid must be unique
     };
 
     await post("/noop/model")
@@ -201,15 +199,13 @@ describe("# Noop", () => {
         expect(res.status).toBe(200);
         expect(res.body.key).toStrictEqual(createInput.key);
       });
-
-    done();
   });
 
-  it("Should return valid response for PUT /noop/model/:id", async (done) => {
+  it("Should return valid response for PUT /noop/model/:id", async () => {
     const items = await _get_noop_items();
     const updateInput = {
-      compName: {
-        value: `${items[0].compName.value}_updated`,
+      name: {
+        value: `${items[0].name.value}_updated`,
       },
     };
 
@@ -219,13 +215,11 @@ describe("# Noop", () => {
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
         expect(res.status).toBe(200);
-        expect(res.body.compName.value).toBe(updateInput.compName.value);
+        expect(res.body.name.value).toBe(updateInput.name.value);
       });
-
-    done();
   });
 
-  it("Should return valid response for DELETE /noop/model/:id", async (done) => {
+  it("Should return valid response for DELETE /noop/model/:id", async () => {
     const items = await _get_noop_items();
 
     await delreq(`/noop/model/${items[0].id}`)
@@ -235,8 +229,6 @@ describe("# Noop", () => {
         expect(res.status).toBe(200);
         expect(res.body.key).toBe(items[0].key);
       });
-
-    done();
   });
 });
 
@@ -273,16 +265,16 @@ describe.skip("# Noop model", () => {
         expect(res.status).toBe(200);
 
         console.log("RES:", res.body);
-        console.log("name(component)", typeof item.compName, item.compName);
-        console.log("value(dynamiczone)", typeof item.compValues, item.compValues);
+        console.log("name(component)", typeof item.name, item.name);
+        console.log("value(dynamiczone)", typeof item.values, item.values);
         console.log("biginteger", typeof item.biginteger, item.biginteger);
         console.log("datetime", typeof item.datetime, item.datetime);
         console.log("json", typeof item.json, item.json);
 
         expect(res.body.key).toBe(item.key);
         expect(res.body.keyslug).toBe(item.keyslug);
-        expect(res.body.compName.value).toBe(item.compName.value);
-        expect(res.body.compValues[0].value).toStrictEqual(item.compValues[0].value);
+        expect(res.body.name.value).toBe(item.name.value);
+        expect(res.body.values[0].value).toStrictEqual(item.values[0].value);
         expect(res.body.secure).toBe(undefined); // <== private field
         expect(res.body.file).toStrictEqual(item.file);
         expect(res.body.text).toBe(item.text);

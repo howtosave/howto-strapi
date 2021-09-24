@@ -22,7 +22,7 @@ const { formatError, formatMongoError, formatNormalError, isObjectId } = require
  *     - database query를 위한 utility function
  *     - API Reference: https://strapi.io/documentation/v3.x/concepts/queries.html#api-reference
  * + service:
- *     - database query를 포함한 다양한 resuable function을 제공한다.
+ *     - database query를 포함한 다양한 reusable function을 제공한다.
  *     - Doc: https://strapi.io/documentation/v3.x/concepts/controllers.html#core-controllers
  * + model
  *     - ORM model(Mongoose, Bookshelf or etc)에 대한 query를 수행할 수 있다.
@@ -98,6 +98,11 @@ module.exports = {
    * #########################################################
    */
 
+  /**
+   * Retrieve records.
+   *
+   * @return {Promise<Array>}
+   */
   async find(ctx) {
     let entities;
     if (ctx.query._q) {
@@ -109,35 +114,49 @@ module.exports = {
     return entities.map((entity) => sanitizeEntity(entity, { model: strapi.models.noop }));
   },
 
+  /**
+   * Retrieve a record.
+   *
+   * @return {Promise<Object>}
+   */
   async findOne(ctx) {
     const { id } = ctx.params;
 
     // !!! Need to check id format
     // check id caused 'CastError: Cast to ObjectId failed for value...'
     if (!id || !isObjectId(id)) {
-      return ctx.badRequest(`Invalid id: ${id}`);
+      return ctx.throw(400, `Invalid id: ${id}`);
       // {"statusCode":400,"error":"Bad Request","message":"Invalid id:..."}
     }
 
     const entity = await strapi.services.noop.findOne({ id });
     if (!entity) {
       return ctx.badRequest({
-        id: "Noop.err.notFound",
+        id: "err.notFound",
         message: `Not found: ${id}`,
       });
-      // { "statusCode":400,"error":"Bad Request","message":"Not found",
-      //   "data":{"id": "err.notFound", "message": "Not found: ..."} }
+      // { "statusCode":400,"error":"Bad Request","message":{"id": "err.notFound", "message": "Not found: ..."} }
     }
     return sanitizeEntity(entity, { model: strapi.models.noop });
   },
 
-  async count(ctx) {
+  /**
+   * Count records.
+   *
+   * @return {Promise<Number>}
+   */
+  count(ctx) {
     if (ctx.query._q) {
       return strapi.services.noop.countSearch(ctx.query);
     }
     return strapi.services.noop.count(ctx.query);
   },
 
+  /**
+   * Create a record.
+   *
+   * @return {Promise<Object>}
+   */
   async create(ctx) {
     // !!! Need to try-catch
     try {
@@ -150,16 +169,7 @@ module.exports = {
       }
       return sanitizeEntity(entity, { model: strapi.models.noop });
     } catch (e) {
-      console.error(">>>>>>>>>>>>>>", e.name);
-      console.error(JSON.stringify(e));
-      const isForce = true;
-      if (e.name === "MongoError") {
-        ctx.badRequest(formatMongoError({ id: "Noop.err.db" }, e, isForce));
-        // id: "Noop.error.db.{err_code}"
-      } else {
-        ctx.badRequest(formatNormalError({ id: "Noop.err.invalidRequest" }, e, isForce));
-        // id: "Noop.error.invalidRequest"
-      }
+      ctx.throw(400, e, {expose: false});
     }
   },
 
@@ -169,10 +179,7 @@ module.exports = {
     // !!! Need to check id format
     // check id caused 'CastError: Cast to ObjectId failed for value...'
     if (!id || !isObjectId(id)) {
-      return ctx.badRequest({
-        id: "Noop.err.invalidRequest",
-        message: `Invalid id: ${id}`,
-      });
+      return ctx.throw(400, `Invalid id: ${id}`);
     }
 
     let entity;

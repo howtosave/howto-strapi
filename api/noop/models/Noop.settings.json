@@ -34,7 +34,7 @@
       "component": "noop.strvalue",
       "required": true
     },
-    "value": {
+    "values": {
       "type": "dynamiczone",
       "components": ["noop.strvalue", "noop.numvalue"],
       "repeatable": true
