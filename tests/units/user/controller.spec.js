@@ -58,8 +58,8 @@ describe("# User Controllers", () => {
     expect(res.status).toBe(200);
   });
 
-  it("GET /users/custom-route", async () => {
-    const res = await req.get("/users/custom-route")
+  it("GET /users-permissions/custom-route", async () => {
+    const res = await req.get("/users-permissions/custom-route")
       .set("Authorization", `Bearer ${testUser.jwt}`)
     if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
     expect(res.status).toBe(200);

@@ -8,19 +8,23 @@ const noop = {
 
 const users_permissions = {
   routes: require("../extensions/users-permissions/config/routes").routes,
+  prefix: "/users-permissions",
   test_data: {
-    "GET /": { // TODO: set prefix with the plugin name, 'users-permissions'
-      permission_public: "skip",
-      permission_authenticated: "skip",
+    "GET /": {
+      permission_public: 403,
+      permission_authenticated: 200,
       permission_administrative: "skip",
     },
-    "GET /users/custom-route": {
+    "GET /custom-route": {
       permission_public: 403,
-      permission_authenticated: 403,
+      permission_authenticated: 200,
       permission_administrative: 403,
     },
     "POST /auth/local": {
-      permission_public: "skip",
+      permission_public: {
+        send: "{}",
+        status: 400,
+      },
     },
     "GET /auth/:provider/callback": {
       permission_public: "skip",

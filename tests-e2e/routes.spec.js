@@ -118,7 +118,7 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
           // lookup order test_data
           // 1. routeData[${method} ${route.path}]
           // 2. route.__test_data__
-          let { test_data } = routeData;
+          let { test_data, prefix } = routeData;
           if (test_data) test_data = test_data[`${method} ${route.path}`];
           if (!test_data) test_data = route.__test_data__;
 
@@ -151,7 +151,7 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
             );
 
             if (!test_data) {
-              path = route.path;
+              path = `${route.config && route.config.prefix ? route.config.prefix : ""}${route.path}`;
             } else {
               // override method
               method = permissionInfo[`override`] || method;
@@ -163,6 +163,11 @@ for (const [apiName, routeData] of Object.entries(targetRoutes)) {
               path = params ? toPath(eval(`(${params})`)) : route.path;
               const query = permissionInfo[`query`] || test_data[`query`] || "";
               if (query) path += `?${query}`;
+
+              // apply route.config.prefix
+              if (route.config && route.config.prefix !== undefined) path = `${route.config.prefix}${path}`;
+              // apply prefix
+              else if (prefix) path = `${prefix}${path}`;
 
               send = permissionInfo[`send`] || test_data[`send`] || "";
               send = send && _.template(send)(extendedData);
