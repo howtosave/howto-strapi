@@ -27,10 +27,7 @@
     "slug": {
       "type": "uid",
       "targetField": "title",
-      "required": true
-    },
-    "content": {
-      "type": "richtext",
+      "required": true,
       "pluginOptions": {
         "i18n": {
           "localized": true
