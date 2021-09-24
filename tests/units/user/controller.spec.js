@@ -19,6 +19,9 @@ const mockUserInput = {
 const permissionInput = {
   "users-permissions": {
     userspermissions: { // controller
+      index: {  // action in lower-case
+        enabled: true,
+      },
       customroute: {  // action in lower-case
         enabled: true,
       },
@@ -48,8 +51,15 @@ describe("# User Controllers", () => {
     testUser && await deleteUser(testUser.user.id);
   });
 
-  it("GET /users-permissions/custom-route", async () => {
-    const res = await req.get("/users-permissions/custom-route")
+  it("GET /users-permissions/", async () => {
+    const res = await req.get("/users-permissions/")
+      .set("Authorization", `Bearer ${testUser.jwt}`)
+    if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
+    expect(res.status).toBe(200);
+  });
+
+  it("GET /users/custom-route", async () => {
+    const res = await req.get("/users/custom-route")
       .set("Authorization", `Bearer ${testUser.jwt}`)
     if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
     expect(res.status).toBe(200);
