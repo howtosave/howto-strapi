@@ -103,6 +103,8 @@ async function deleteTestData() {
 const _get_noop_items = async (id = null) =>
   id ? await strapi.services["noop"].findOne({ id }) : await strapi.services["noop"].find({_sort:"createdAt:ASC"});
 
+const _delete_noop_item = async (id) => strapi.services["noop"].delete({id});
+
 describe("# Noop", () => {
   const { head, get, post, put, delete: delreq } = request(strapi.server);
   let mockItems;
@@ -126,6 +128,9 @@ describe("# Noop", () => {
     await head("/noop/model/count")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .expect(200);
+    await head("/noop/model/count?_q=a")
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .expect(200);
     await head(`/noop/model/${mockItems[0].id}`)
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .expect(200);
@@ -133,6 +138,17 @@ describe("# Noop", () => {
 
   it("Should return valid response for GET /noop/model/count", async () => {
     await get("/noop/model/count")
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .then((res) => {
+        if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
+        expect(res.status).toBe(200);
+        expect(res.body >= mockItems.length).toBeTruthy();
+      });
+  });
+
+  it("Should return valid response for GET /noop/model/count?_q", async () => {
+    // search query
+    await get("/noop/model/count?_q=key-001")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .then((res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
@@ -161,6 +177,16 @@ describe("# Noop", () => {
       });
   });
 
+  it("Should return valid response for GET /noop/model?invalid_query", async () => {
+    await get(`/noop/model?key_eq=invalid_key`)
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .then((res) => {
+        if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
+        expect(res.status).toBe(200);
+        expect(res.body.length).toBe(0);
+      });
+  });
+
   it("Should return valid response for GET /noop/model?{searchQuery}", async () => {
     await get(`/noop/model?key_eq=${mockItems[0].key}`)
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
@@ -183,6 +209,28 @@ describe("# Noop", () => {
       });
   });
 
+  it("Should return valid response for GET /noop/model/invalid_id", async () => {
+    await get(`/noop/model/invalid_id`)
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        expect(res.body.statusCode).toBe(400);
+        expect(res.body.error).toBe("Bad Request");
+        expect(res.body.message).toMatch(/invalid id/i);
+      });
+  });
+
+  it("Should return valid response for GET /noop/model/valid_but_not_existed", async () => {
+    await get(`/noop/model/0123456789abcdef01234567`)
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .then((res) => {
+        expect(res.status).toBe(404);
+        expect(res.body.statusCode).toBe(404);
+        expect(res.body.error).toBe("Not Found");
+        expect(res.body.message).toMatch(/entry.notFound/i);
+      });
+  });
+
   it("Should return valid response for POST /noop/model", async () => {
     const createInput = {
       ...mockItemsData[0],
@@ -194,10 +242,100 @@ describe("# Noop", () => {
     await post("/noop/model")
       .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
       .send(createInput)
-      .then((res) => {
+      .then( async (res) => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
         expect(res.status).toBe(200);
         expect(res.body.key).toStrictEqual(createInput.key);
+
+        // delete
+        await _delete_noop_item(res.body.id);
+      });
+  });
+
+  it("Should return validation error for POST /noop/model", async () => {
+    const createInput = {};
+
+    await post("/noop/model")
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .send(createInput)
+      .then( async (res) => {
+        expect(res.status).toBe(400);
+        expect(res.body.statusCode).toBe(400);
+        expect(res.body.error).toBe("Bad Request");
+        expect(res.body.message).toMatch(/ValidationError/i);
+      });
+  });
+
+  it("Should return duplicate error for POST /noop/model", async () => {
+    const createInput = {
+      key: mockItems[0].key,
+      name: mockItems[0].name,
+    };
+
+    await post("/noop/model")
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .send(createInput)
+      .then( async (res) => {
+        //if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
+        expect(res.status).toBe(400);
+        expect(res.body.statusCode).toBe(400);
+        expect(res.body.error).toBe("Bad Request");
+        expect(res.body.message).toMatch(/Duplicate entry/i);
+      });
+  });
+
+  it("Should return enumeration validation error for POST /noop/model", async () => {
+    const r = Math.floor(Math.random()*10000000);
+    const createInput = {
+      key: mockItems[0].key + r,
+      name: mockItems[0].name,
+      enumeration: "c", // invalid value
+    };
+
+    await post("/noop/model")
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .send(createInput)
+      .then( async (res) => {
+        //if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
+        expect(res.status).toBe(400);
+        expect(res.body.message).toMatch(/ValidationError/i);
+      });
+  });
+
+  it("Should return email validation error for POST /noop/model", async () => {
+    const r = Math.floor(Math.random()*10000000);
+    const createInput = {
+      key: mockItems[0].key + r,
+      name: mockItems[0].name,
+      email: "a", // invalid value
+    };
+
+    await post("/noop/model")
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .send(createInput)
+      .then( async (res) => {
+        //if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
+        expect(res.status).toBe(400);
+        expect(res.body.message).toMatch(/ValidationError/i);
+      });
+  });
+
+  it("Should return number validation error for POST /noop/model", async () => {
+    const r = Math.floor(Math.random()*10000000);
+    const createInput = {
+      key: mockItems[0].key + r,
+      name: mockItems[0].name,
+      integer: "a", // invalid value
+    };
+
+    await post("/noop/model")
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .send(createInput)
+      .then( async (res) => {
+        //if (res.status === 200) await _delete_noop_item(res.body.id);
+        //if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
+        expect(res.status).toBe(400);
+        expect(res.body.message).toMatch(/ValidationError/i);
       });
   });
 
@@ -219,6 +357,34 @@ describe("# Noop", () => {
       });
   });
 
+  it("Should return valid response for PUT /noop/model/invalid", async () => {
+    const updateInput = {};
+
+    await put(`/noop/model/invalid_id`)
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .send(updateInput)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        expect(res.body.statusCode).toBe(400);
+        expect(res.body.error).toBe("Bad Request");
+        expect(res.body.message).toMatch(/invalid id/i);
+      });
+  });
+
+  it("Should return valid response for PUT /noop/model/valid_but_not_existed", async () => {
+    const updateInput = {};
+
+    await put(`/noop/model/0123456789abcdef01234567`)
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .send(updateInput)
+      .then((res) => {
+        expect(res.status).toBe(404);
+        expect(res.body.statusCode).toBe(404);
+        expect(res.body.error).toBe("Not Found");
+        expect(res.body.message).toMatch(/entry.notFound/i);
+      });
+  });
+
   it("Should return valid response for DELETE /noop/model/:id", async () => {
     const items = await _get_noop_items();
 
@@ -228,6 +394,27 @@ describe("# Noop", () => {
         if (res.status != 200) console.log(">>> BODY:", JSON.stringify(res.body));
         expect(res.status).toBe(200);
         expect(res.body.key).toBe(items[0].key);
+      });
+  });
+
+  it("Should return valid response for DELETE /noop/model/invalid_id", async () => {
+    await delreq(`/noop/model/invalid_id`)
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe("Bad Request");
+        expect(res.body.message).toMatch(/invalid id/i);
+      });
+  });
+
+  it("Should return valid response for DELETE /noop/model/valid_but_not_existed", async () => {
+    await delreq(`/noop/model/0123456789abcdef01234567`)
+      .set("Authorization", `Bearer ${mockUsers["user1"].jwt}`)
+      .then((res) => {
+        expect(res.status).toBe(404);
+        expect(res.body.statusCode).toBe(404);
+        expect(res.body.error).toBe("Not Found");
+        expect(res.body.message).toMatch(/entry.notFound/i);
       });
   });
 });

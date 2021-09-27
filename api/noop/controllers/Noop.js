@@ -56,7 +56,7 @@ module.exports = {
       strapi.log.debug("Request user:", ctx.state.user);
     }
     if (ctx.request.method === "POST" && !ctx.state.user) {
-      return ctx.badRequest("no user");
+      return ctx.throw(404, "no user");
     }
     return ctx.send(`${ctx.request.method}:noop`);
   },
@@ -131,11 +131,8 @@ module.exports = {
 
     const entity = await strapi.services.noop.findOne({ id });
     if (!entity) {
-      return ctx.badRequest({
-        id: "err.notFound",
-        message: `Not found: ${id}`,
-      });
-      // { "statusCode":400,"error":"Bad Request","message":{"id": "err.notFound", "message": "Not found: ..."} }
+      return ctx.throw(404, `entry.notFound: ${id}`);
+      // { "statusCode":404,"error":"Bad Request","message":"entry.notFound:..." }
     }
     return sanitizeEntity(entity, { model: strapi.models.noop });
   },
@@ -197,10 +194,7 @@ module.exports = {
       // This block never be called.
       // Because strapi sends 404 error in the 'update' function if no entry found
       //
-      return ctx.badRequest({
-        id: "Noop.err.notFound",
-        message: `Invalid id: ${id}`,
-      });
+      return ctx.throw(404, `entry.notFound: ${id}`);
     }
     return sanitizeEntity(entity, { model: strapi.models.noop });
   },
@@ -210,12 +204,13 @@ module.exports = {
 
     // !!! Need to check id format caused 'CastError'
     if (!id || !isObjectId(id)) {
-      return ctx.badRequest({
-        id: "Noop.err.invalid",
-        message: `Invalid id: ${id}`,
-      });
+      return ctx.throw(400, `Invalid id: ${id}`);
     }
 
-    return strapi.services.noop.delete({ id });
+    let entity = await strapi.services.noop.delete({ id });
+    if (!entity) {
+      return ctx.throw(404, `entry.notFound: ${id}`);
+    }
+    return sanitizeEntity(entity, { model: strapi.models.noop });
   },
 };
