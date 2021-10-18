@@ -47,13 +47,12 @@
     "strapi-utils": "*"
   },
   "devDependencies": {
+    "jest": "27.0.3",
+    "jest-environment-node": "27.0.3",
     "knex": "0.21.18",
     "mysql": "^2.17.1",
     "pg": "^7.10.0",
     "sqlite3": "^4.0.6",
-
-    "jest": "27.0.3",
-    "jest-environment-node": "27.0.3",
     "supertest": "^4.0.2"
   },
   "strapi": {
@@ -66,16 +65,13 @@
   "license": "MIT",
   "workspaces": [
     "packages/*",
-
     "strapi/packages/create-strapi-app",
     "strapi/packages/create-strapi-starter",
-
     "strapi/packages/strapi",
     "strapi/packages/strapi-admin",
     "strapi/packages/strapi-connector-bookshelf",
     "strapi/packages/strapi-connector-mongoose",
     "strapi/packages/strapi-database",
-
     "strapi/packages/strapi-generate",
     "strapi/packages/strapi-generate-api",
     "strapi/packages/strapi-generate-controller",
@@ -84,12 +80,10 @@
     "strapi/packages/strapi-generate-plugin",
     "strapi/packages/strapi-generate-policy",
     "strapi/packages/strapi-generate-service",
-
     "strapi/packages/strapi-helper-plugin",
     "strapi/packages/strapi-hook-ejs",
     "strapi/packages/strapi-hook-redis",
     "strapi/packages/strapi-middleware-views",
-
     "strapi/packages/strapi-plugin-content-manager",
     "strapi/packages/strapi-plugin-content-type-builder",
     "strapi/packages/strapi-plugin-documentation",
@@ -99,18 +93,15 @@
     "strapi/packages/strapi-plugin-sentry",
     "strapi/packages/strapi-plugin-upload",
     "strapi/packages/strapi-plugin-users-permissions",
-
     "strapi/packages/strapi-provider-email-amazon-ses",
     "strapi/packages/strapi-provider-email-mailgun",
     "strapi/packages/strapi-provider-email-nodemailer",
     "strapi/packages/strapi-provider-email-sendgrid",
     "strapi/packages/strapi-provider-email-sendmail",
-
     "strapi/packages/strapi-provider-upload-aws-s3",
     "strapi/packages/strapi-provider-upload-cloudinary",
     "strapi/packages/strapi-provider-upload-local",
     "strapi/packages/strapi-provider-upload-rackspace",
-
     "strapi/packages/strapi-utils"
   ]
 }

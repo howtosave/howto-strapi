@@ -30,7 +30,7 @@ function initServerUrl(targetServer = null) {
   }
 
   if (!url.pathname) {
-    url.pathname = "/nitroapi";
+    url.pathname = "/carbonapi";
   }
 
   return {

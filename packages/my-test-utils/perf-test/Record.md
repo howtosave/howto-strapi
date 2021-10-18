@@ -11,7 +11,7 @@
 ### v2.4.0 get (1 document)
 
 ```txt
-Target URL:          get http://127.0.0.1:1337/nitroapi/noop/model
+Target URL:          get http://127.0.0.1:1337/carbonapi/noop/model
 Max requests:        10000
 Concurrency level:   100
 Requests per second: 10

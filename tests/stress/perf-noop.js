@@ -18,4 +18,4 @@ function send_request(baseUrl, path, query) {
   for (const res of ress) {
     console.log(count--, res.body);
   }
-})("http://localhost:1337", "/nitroapi/kue/add");
+})("http://localhost:1337", "/carbonapi/kue/add");
