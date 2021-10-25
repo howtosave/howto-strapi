@@ -1,7 +1,7 @@
 #
 # GraphQL Query
 # 
-# Playground: http://localhost:1337/carbonapi/graphql
+# Playground: http://localhost:1337/carboapi/graphql
 #
 
 

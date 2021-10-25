@@ -2,7 +2,7 @@
   "name": "strapi-login",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/carbonapi/auth",
+  "homepage": "/carboapi/auth",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -16,13 +16,13 @@
   },
   "scripts": {
     "dev": "react-scripts start",
-    "build": "react-scripts build && mkdir -p build/carbonapi/auth && mv build/* build/carbonapi/auth",
+    "build": "react-scripts build && mkdir -p build/carboapi/auth && mv build/* build/carboapi/auth",
     "serve": "serve -d --listen 3000 --config ./package.json build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "rewrites": [
-    { "source": "carbonapi/auth/**", "destination": "/carbonapi/auth/index.html" }
+    { "source": "carboapi/auth/**", "destination": "/carboapi/auth/index.html" }
   ],
   "eslintConfig": {
     "extends": "react-app"

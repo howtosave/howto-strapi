@@ -7,7 +7,7 @@ import {
 import Home from './pages/Home';
 import LoginRedirect from './pages/LoginRedirect';
 
-const PREFIXURL = "/carbonapi/auth";
+const PREFIXURL = "/carboapi/auth";
 
 const App = () => {
   if (!process.env.REACT_APP_BACKEND_URL) {

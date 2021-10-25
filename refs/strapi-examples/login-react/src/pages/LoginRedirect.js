@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation, useParams } from "react-router-dom";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const PREFIXURL = "/carbonapi/auth";
+const PREFIXURL = "/carboapi/auth";
 
 const LoginRedirect = (props) => {
   const [text, setText] = useState('Loading...');

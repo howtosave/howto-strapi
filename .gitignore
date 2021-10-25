@@ -82,8 +82,8 @@ ssl
 nbproject
 public/uploads/*
 !public/uploads/.gitkeep
-public/carbonapi/uploads/*
-!public/carbonapi/uploads/.gitkeep
+public/carboapi/uploads/*
+!public/carboapi/uploads/.gitkeep
 .env
 build/
 *.local
