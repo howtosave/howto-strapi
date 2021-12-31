@@ -11,5 +11,5 @@
 const { credentialInfoFromEnv, initFirebaseApp } = require("my-firebase");
 
 module.exports = () => {
-  strapi.firebase = initFirebaseApp({ credential: credentialInfoFromEnv(process.env) });
+  //strapi.firebase = initFirebaseApp({ credential: credentialInfoFromEnv(process.env) });
 };

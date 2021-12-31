@@ -289,7 +289,7 @@ module.exports = {
         params.confirmed = true;
       }
       const user = await strapi.query('user', 'users-permissions').create(params);
-
+/* Skip firebase
       try {
         // create firebase user instance with user._id
         const fbuser = await firebase.createUser({
@@ -305,7 +305,7 @@ module.exports = {
         console.error("!!! Error while creating firebase user:", e.code, e.message);
         return ctx.badRequest(null, e);
       }
-
+*/
       const sanitizedUser = sanitizeEntity(user, {
         model: strapi.query('user', 'users-permissions').model,
       });
