@@ -1,7 +1,7 @@
 {
   "name": "howto-strapi",
   "private": true,
-  "version": "3.6.8",
+  "version": "3.6.9",
   "description": "A strapi example application.",
   "scripts": {
     "dev": "strapi develop",
@@ -28,7 +28,7 @@
     "lodash": "^4.17.5",
     "my-api-utils": "*",
     "my-firebase": "*",
-    "strapi": "3.6.8",
+    "strapi": "3.6.9",
     "strapi-admin": "*",
     "strapi-connector-bookshelf": "*",
     "strapi-connector-mongoose": "*",
