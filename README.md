@@ -1,6 +1,6 @@
-# HowTo Strapi V4
+# HowTo Strapi V3
 
-Mono-Repo for Strapi V4 Project
+Mono-Repo for Strapi V3 Project
 
 ## strapi packages to be built after modification
 
@@ -11,11 +11,8 @@ N.B.
 You may remove the dependency packages under `node_modules` after building the modified packages.
 You may got some errors when you run an application without removing the dependency packages under the `strapi` directory.
 
-- @strapi/admin:
-  - go to `strapi/packages/core/admin`
-  - run `yarn build`
-- @strapi/helper-plugin
-  - go to `strapi/packages/core/helper-plugin`
+- strapi-helper-plugin
+  - go to `strapi/packages/strapi-helper-plugin`
   - run `yarn build`
 - to remove all `node_modules` directories under `./strapi`
   - run `find ./strapi -type d -name node_modules | xargs rm -rf`
@@ -25,14 +22,14 @@ You may got some errors when you run an application without removing the depende
 ```sh
 cd ./strapi
 # fetch new version from strapi
-git fetch -q strapi v4.1.3
+git fetch -q strapi v3.6.1
 git co FETCH_HEAD
 # create new branch for the new version
-git co -b v4.1.3
+git co -b v3.6.1
 
-# create new branch for my version from the prev version, my4.1.2
-git co my4.1.2
-git co -b my4.1.3
+# create new branch for my version from the prev version, my3.6.0
+git co my3.6.0
+git co -b my3.6.1
 
 ```
 
