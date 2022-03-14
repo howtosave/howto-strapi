@@ -1,26 +1,23 @@
 {
-  "collectionName": "up_users",
+  "collectionName": "users-permissions_user",
   "info": {
-    "name": "User",
-    "description": "User Permission User",
-    "singularName": "user",
-    "pluralName": "users",
-    "displayName": "User",
-    "privateAttributes": ["password", "resetPasswordToken", "confirmationToken"]
+    "name": "user",
+    "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": false,
+    "timestamps": ["created_at", "updated_at"]
   },
   "attributes": {
     "username": {
       "type": "string",
       "minLength": 3,
+      "unique": true,
       "configurable": false,
       "required": true
     },
     "email": {
       "type": "email",
-      "unique": true,
       "minLength": 6,
       "configurable": false,
       "required": true
@@ -56,16 +53,15 @@
       "configurable": false
     },
     "role": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.role",
-      "inversedBy": "users",
+      "model": "role",
+      "via": "users",
+      "plugin": "users-permissions",
       "configurable": false
     },
     "picture": {
-      "type": "media",
-      "multiple": false,
-      "required": false
+      "model": "file",
+      "via": "related",
+      "plugin": "upload"
     }
   }
 }

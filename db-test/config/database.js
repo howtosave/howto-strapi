@@ -1,42 +1,64 @@
 const sqlite = {
-  client: 'sqlite',
-  connection: {
+  connector: 'bookshelf',
+  settings: {
+    client: 'sqlite',
     filename: '.tmp/data.db',
   },
-  useNullAsDefault: true,
+  options: {
+    // debug: true,
+    useNullAsDefault: true,
+  },
 };
 
 const postgres = {
-  client: 'postgres',
-  connection: {
-    database: 'strapi',
-    user: 'strapi',
-    password: 'strapi00',
-    port: 5432,
-    host: 'localhost',
+  connector: 'bookshelf',
+  settings: {
+    client: 'postgres',
+    database: process.env.DATABASE_NAME,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    port: process.env.DATABASE_PORT,
+    host: process.env.DATABASE_HOST,
   },
+  options: {},
 };
 
 const mysql = {
-  client: 'mysql',
-  connection: {
-    database: 'strapi',
-    user: 'strapi',
-    password: 'strapi00',
-    port: 3306,
-    host: 'localhost',
+  connector: 'bookshelf',
+  settings: {
+    client: 'mysql',
+    database: process.env.DATABASE_NAME,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    port: process.env.DATABASE_PORT,
+    host: process.env.DATABASE_HOST,
   },
+  options: {},
+};
+
+const mongo = {
+  connector: 'mongoose',
+  settings: {
+    client: 'mongodb',
+    database: process.env.DATABASE_NAME,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    port: process.env.DATABASE_PORT,
+    host: process.env.DATABASE_HOST,
+  },
+  options: {},
 };
 
 const db = {
   mysql,
   sqlite,
   postgres,
+  mongo,
 };
 
-module.exports = ({env}) => {
-  console.log(">>> Connecting database", db[process.env.DB]);
-  return {
-    connection: db[process.env.DB],
-  };
+module.exports = {
+  defaultConnection: 'default',
+  connections: {
+    default: process.env.DB ? db[process.env.DB] || db.sqlite : db.sqlite,
+  },
 };
