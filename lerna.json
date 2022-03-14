@@ -1,0 +1,12 @@
+{
+  "packages": [
+    "packages/*",
+    "strapi/packages/*",
+    "getstarted",
+    "customized",
+    "db-test"
+  ],
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "version": "0.0.0"
+}

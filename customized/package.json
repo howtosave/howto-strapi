@@ -1,0 +1,66 @@
+{
+  "name": "customized",
+  "private": true,
+  "version": "3.6.9",
+  "description": "A strapi example application.",
+  "scripts": {
+    "dev": "strapi develop",
+    "dev-ce": "STRAPI_DISABLE_EE=true strapi dev",
+    "dev:admin": "yarn dev --watch-admin --browser false",
+    "start": "NODE_ENV=production node server.js",
+    "start:dev": "node server.js",
+    "build:admin": "strapi build --no-optimization",
+    "build:admin:prod": "NODE_ENV=production strapi build",
+    "build:admin-ce": "STRAPI_DISABLE_EE=true yarn build:admin",
+    "deploy:local": "./tools/deploy.sh svc00@127.0.0.1 -e dev",
+    "test": "jest --config ./tests/jest.config.js --forceExit --detectOpenHandles",
+    "test-reset": "RESET_EACH=1 jest --config ./tests/jest.config.js --forceExit --detectOpenHandles",
+    "test:unit": "jest --config ./tests/jest.config.js --forceExit --detectOpenHandles ./tests/units/*",
+    "test:e2e": "TARGET_SERVER=local jest --config ./tests-e2e/jest.config.js --forceExit --detectOpenHandles ./tests-e2e/*",
+    "test:e2e:dev": "TARGET_SERVER=dev jest --config ./tests-e2e/jest.config.js --forceExit --detectOpenHandles ./tests-e2e/*",
+    "test:e2e:prod": "TARGET_SERVER=prod jest --config ./tests-e2e/jest.config.js --forceExit --detectOpenHandles ./tests-e2e/*",
+    "docker:run": "./tools/docker/mongo/run.sh --detach",
+    "build:docker:nginx": "./tools/docker/nginx/docker-build.sh",
+    "build:docker:pm2": "./tools/docker/pm2/docker-build.sh",
+    "init:db:dev": "NODE_ENV=development node tools/mongo/create-db-user.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.5",
+    "my-api-utils": "*",
+    "my-firebase": "*",
+    "strapi": "3.6.9",
+    "strapi-admin": "*",
+    "strapi-connector-bookshelf": "*",
+    "strapi-connector-mongoose": "*",
+    "strapi-middleware-views": "*",
+    "strapi-plugin-content-manager": "*",
+    "strapi-plugin-content-type-builder": "*",
+    "strapi-plugin-documentation": "*",
+    "strapi-plugin-email": "*",
+    "strapi-plugin-graphql": "*",
+    "strapi-plugin-i18n": "*",
+    "strapi-plugin-upload": "*",
+    "strapi-plugin-users-permissions": "*",
+    "strapi-provider-email-mailgun": "*",
+    "strapi-provider-upload-aws-s3": "*",
+    "strapi-provider-upload-cloudinary": "*",
+    "strapi-utils": "*"
+  },
+  "devDependencies": {
+    "jest": "27.0.3",
+    "jest-environment-node": "27.0.3",
+    "knex": "0.21.18",
+    "mysql": "^2.17.1",
+    "pg": "^7.10.0",
+    "sqlite3": "^4.0.6",
+    "supertest": "^4.0.2"
+  },
+  "strapi": {
+    "uuid": "getstarted"
+  },
+  "engines": {
+    "node": ">=10.10.0",
+    "yarn": ">=1.21.0"
+  },
+  "license": "MIT"
+}

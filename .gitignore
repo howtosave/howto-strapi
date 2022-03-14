@@ -33,63 +33,6 @@ $RECYCLE.BIN/
 
 
 ############################
-# Packages
-############################
-
-*.7z
-*.csv
-*.dat
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
-*.zip
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.seed
-*.so
-*.swo
-*.swp
-*.swn
-*.swm
-*.out
-*.pid
-
-
-############################
-# Logs and databases
-############################
-
-.tmp
-*.log
-*.sql
-*.sqlite
-*.sqlite3
-
-
-############################
-# Misc.
-############################
-
-*#
-ssl
-.idea
-nbproject
-public/uploads/*
-!public/uploads/.gitkeep
-public/carboapi/uploads/*
-!public/carboapi/uploads/.gitkeep
-.env
-build/
-*.local
-tmp/
-
-############################
 # Node.js
 ############################
 
@@ -109,13 +52,3 @@ node_modules
 testApp
 coverage
 
-
-############################
-# Strapi
-############################
-exports/
-.cache/
-build/
-**/documentation/*/*
-!**/documentation/*/overrides
-exports

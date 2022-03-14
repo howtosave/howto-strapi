@@ -1,56 +1,83 @@
-# strapi fork for CARBON
+# HowTo Strapi V4
 
-## Merge sequence
+Mono-Repo for Strapi V4 Project
 
-### merge strapi
+## strapi packages to be built after modification
+
+After modification below packages, you should run `build` command.
+Dependency packages installation is necessary to `build` the packages.
+
+N.B.
+You may remove the dependency packages under `node_modules` after building the modified packages.
+You may got some errors when you run an application without removing the dependency packages under the `strapi` directory.
+
+- @strapi/admin:
+  - go to `strapi/packages/core/admin`
+  - run `yarn build`
+- @strapi/helper-plugin
+  - go to `strapi/packages/core/helper-plugin`
+  - run `yarn build`
+- to remove all `node_modules` directories under `./strapi`
+  - run `find ./strapi -type d -name node_modules | xargs rm -rf`
+
+## Merging with new strapi version
 
 ```sh
-# go to strapi submodule directory
-cd strapi
+cd ./strapi
+# fetch new version from strapi
+git fetch -q strapi v4.1.3
+git co FETCH_HEAD
+# create new branch for the new version
+git co -b v4.1.3
 
-# add original strapi repository if necessary
-git remote add strapi https://github.com/strapi/strapi.git
+# create new branch for my version from the prev version, my4.1.2
+git co my4.1.2
+git co -b my4.1.3
 
-# checkout base version
-git checkout my3.6.1
+```
 
-# create a branch for new version
-git checkout -b my3.6.2
+## Trouble-shooting
 
-# *fetch* (not pull) the new version from remote strapi
-git fetch strapi v3.6.2
+### when the admin console does not work
 
-# merge with the fetched version
-git merge FETCH_HEAD
+When you got an error like this: 
 
-# resolve conflicts and commits
+```Uncaught TypeError: Cannot read properties of undefined (reading 'toggleNotification')```
 
-# !!! N.B. !!!
-# build strapi-helper-plugin
-cd packages/strapi-helper-plugin
+아래 예시처럼 `./strapi` 디렉토리 아래 모든 `node_modules` 디렉토리를 삭제 후 재시도 한다.
+
+```sh
+# go to strapi directory
+cd ./strapi
+# remove dependency packages for strapi
+find . -name node_modules -type d | xargs rm -rf
+# go to project root directory
+cd ../getstarted
+# install dependency packages
+yarn install
+# build admin
 yarn build
-
-# gen diff
-bash tools/diff/gen-strapi-diff.sh v3.6.1
+# start dev server and browse admin console
+yarn dev
 ```
 
-### merge example
+### when you meet "sharp" module installation issue on M1 Mac
 
-```sh
-# check diff briefly
-diff -qrZ --exclude documentation -x .git -x strapi -x exports -x node_modules -x build -x .cache -x .tmp -x .env -x packages -x tools ./ ./strapi/examples/getstarted
+When you got an error like this: 
 
-# do merging work with emacs
-emacs --eval '(ediff-directories "./" "./strapi/examples/getstarted/" ".*")'
+```txt
+Something went wrong installing the "sharp" module
+
+Cannot find module '../build/Release/sharp-darwin-arm64v8.node'
+Require stack:
+- .../node_modules/sharp/lib/sharp.js
+- .../node_modules/sharp/lib/constructor.js
+...
 ```
 
-## Tools
-
-### Initial setup
-
-#### Database
+아래 예시처럼 기 설치된 `sharp` package를 삭제/재설치 후 재시도 한다.
 
 ```sh
-# create database and users
-node tools/setup/mongodb.js
+rm -rf ../node_modules/sharp
+yarn install --check-files
 ```
