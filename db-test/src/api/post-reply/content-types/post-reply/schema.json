@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "post_replies",
+  "info": {
+    "singularName": "post-reply",
+    "pluralName": "post-replies",
+    "displayName": "PostReplies",
+    "description": "Collection for replies to posts"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "content": {
+      "type": "text",
+      "required": true
+    },
+    "post": {
+      "type": "string",
+      "required": true
+    },
+    "children": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::post-reply.post-reply"
+    },
+    "parent": {
+      "type": "string"
+    }
+  }
+}

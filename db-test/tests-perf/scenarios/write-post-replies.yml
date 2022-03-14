@@ -1,0 +1,28 @@
+config:
+  target: "http://localhost:1337/api"
+  # phase
+  phases:
+    - duration: 10      # in seconds
+      arrivalRate: 100  # requests per a second
+  payload:
+    # path is relative to the location of the test script
+    path: "../input-data/post-replies.csv"
+    fields:
+      - "id"
+      - "content"
+      - "post"
+      - "createdAt"
+      - "updatedAt"
+      - "authToken"
+
+scenarios:
+  - name: "WRITE post-replies"
+    flow:
+      - post:
+          url: "/posts/{{ post }}/post-replies"
+          headers:
+            Content-Type: application/json
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            data:
+              content: "{{ content }}"

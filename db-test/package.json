@@ -1,0 +1,50 @@
+{
+  "name": "db-test",
+  "version": "3.6.9",
+  "description": "Strapi DB Test",
+  "scripts": {
+    "dev": "strapi develop",
+    "start": "NODE_ENV=production node server.js",
+    "start:ms": "DB=mysql yarn start",
+    "start:pg": "DB=postgres yarn start",
+    "pm2:ms": "DB=mysql pm2 --env production startOrRestart pm2.config.js",
+    "pm2:pg": "DB=postgres pm2 --env production startOrRestart pm2.config.js",
+    "pm2:stop": "pm2 delete strapi-db-test",
+    "build": "strapi build",
+    "perf:gen": "node ./tests-perf/gen-test-data.js",
+    "perf:read1": "artillery run ./tests-perf/scenarios/read-posts.yml",
+    "perf:read2": "artillery run ./tests-perf/scenarios/read-post-replies.yml",
+    "perf:write1": "artillery run ./tests-perf/scenarios/write-posts.yml",
+    "perf:write2": "artillery run ./tests-perf/scenarios/write-post-replies.yml"
+  },
+  "dependencies": {
+    "lodash": "4.17.21",
+    "mysql": "2.18.1",
+    "pg": "8.6.0",
+    "strapi": "3.6.9",
+    "strapi-admin": "3.6.9",
+    "strapi-connector-bookshelf": "3.6.9",
+    "strapi-connector-mongoose": "3.6.9",
+    "strapi-middleware-views": "3.6.9",
+    "strapi-plugin-content-manager": "3.6.9",
+    "strapi-plugin-content-type-builder": "3.6.9",
+    "strapi-plugin-documentation": "3.6.9",
+    "strapi-plugin-email": "3.6.9",
+    "strapi-plugin-graphql": "3.6.9",
+    "strapi-plugin-i18n": "3.6.9",
+    "strapi-plugin-upload": "3.6.9",
+    "strapi-plugin-users-permissions": "3.6.9",
+    "strapi-provider-email-mailgun": "3.6.9",
+    "strapi-provider-upload-aws-s3": "3.6.9",
+    "strapi-provider-upload-cloudinary": "3.6.9",
+    "strapi-utils": "3.6.9"
+  },
+  "devDependencies": {
+    "artillery": "2.0.0-9"
+  },
+  "engines": {
+    "node": ">=12.10",
+    "npm": ">=1.21"
+  },
+  "license": "UNLICENSED"
+}

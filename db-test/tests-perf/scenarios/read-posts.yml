@@ -1,0 +1,22 @@
+config:
+  target: "http://localhost:1337/api"
+  # phase
+  phases:
+    - duration: 10      # in seconds
+      arrivalRate: 500  # requests per a second
+  payload:
+    # path is relative to the location of the test script
+    path: "../input-data/posts.csv"
+    fields:
+      - "id"
+      - "title"
+      - "content"
+      - "createdAt"
+      - "updatedAt"
+      - "authToken"
+
+scenarios:
+  - name: "READ posts"
+    flow:
+      - get:
+          url: "/posts/{{ id }}?populate=author"

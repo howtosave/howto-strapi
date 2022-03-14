@@ -1,0 +1,85 @@
+#
+# auth
+#
+@BASE_URL=http://localhost:1337/api
+@USER_NAME=test001
+@USER_EMAIL=test001@local.host
+@USER_PASSWORD=test000
+
+# auth local
+# @name login
+POST {{BASE_URL}}/auth/local HTTP/1.1
+content-type: application/json
+
+{
+  "identifier": "{{USER_EMAIL}}",
+  "password": "{{USER_PASSWORD}}"
+}
+###
+
+@authToken = {{login.response.body.jwt}}
+
+# find posts
+# @name findPost
+GET {{BASE_URL}}/posts HTTP/1.1
+###
+
+@POST_ID = {{findPost.response.body.$[0].id}}
+
+# create post reply
+# @name postReply
+POST {{BASE_URL}}/posts/{{POST_ID}}/post-replies?populate=children HTTP/1.1
+content-type: application/json
+
+{
+  "data": {
+    "content": "hi, there~"
+  }
+}
+###
+
+# find
+# @name find
+GET {{BASE_URL}}/posts/{{POST_ID}}/post-replies?sort=updatedAt:desc&populate=children HTTP/1.1
+###
+
+@PARENT_ID = {{find.response.body.$[0].id}}
+
+# findOne
+GET {{BASE_URL}}/posts/{{POST_ID}}/post-replies/{{PARENT_ID}}?populate=children HTTP/1.1
+###
+
+# update
+PUT {{BASE_URL}}/posts/{{POST_ID}}/post-replies/{{PARENT_ID}} HTTP/1.1
+content-type: application/json
+
+{
+  "data": {
+    "content": "updated reply~~~"
+  }  
+}
+###
+
+# create reply-reply
+# @name postReplyReply
+POST {{BASE_URL}}/posts/{{POST_ID}}/post-replies/{{PARENT_ID}} HTTP/1.1
+content-type: application/json
+
+{
+  "data": {
+    "content": "hi reply~~~"
+  }
+}
+###
+
+# findOne reply-reply
+GET {{BASE_URL}}/posts/{{POST_ID}}/post-replies/{{postReplyReply.response.body.id}}?populate=children HTTP/1.1
+###
+
+# delete
+DELETE {{BASE_URL}}/posts/{{POST_ID}}/post-replies/{{PARENT_ID}}?populate=children HTTP/1.1
+###
+
+# delete reply-reply
+DELETE {{BASE_URL}}/posts/{{POST_ID}}/post-replies/{{postReplyReply.response.body.id}}?populate=children HTTP/1.1
+###

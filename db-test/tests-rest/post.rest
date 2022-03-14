@@ -1,0 +1,63 @@
+#
+# auth
+#
+@BASE_URL=http://localhost:1337/api
+@USER_NAME=test001
+@USER_EMAIL=test001@local.host
+@USER_PASSWORD=test000
+
+# auth local
+# @name login
+POST {{BASE_URL}}/auth/local HTTP/1.1
+content-type: application/json
+
+{
+  "identifier": "{{USER_EMAIL}}",
+  "password": "{{USER_PASSWORD}}"
+}
+###
+@authToken = {{login.response.body.jwt}}
+
+# create
+POST {{BASE_URL}}/posts HTTP/1.1
+content-type: application/json
+Authorization: bearer {{authToken}}
+
+{
+  "data": {
+    "title": "hi~",
+    "content": "hi there~~~"
+  }
+}
+###
+
+# find
+# @name find
+GET {{BASE_URL}}/posts?populate=author&sort=id:desc&fields=title HTTP/1.1
+Authorization: bearer {{authToken}}
+###
+
+@ENTITY_ID = {{find.response.body.$[0].id}}
+#@ENTITY_ID = {{find.response.body.data[0].id}}
+
+# findOne
+GET {{BASE_URL}}/posts/{{ENTITY_ID}}?populate=author&fields=title&fields=meta HTTP/1.1
+Authorization: bearer {{authToken}}
+###
+
+# update
+PUT {{BASE_URL}}/posts/{{ENTITY_ID}}?populate=author&fields=title HTTP/1.1
+content-type: application/json
+Authorization: bearer {{authToken}}
+
+{
+  "data": {
+    "title": "title updated....."
+  }
+}
+###
+
+# delete
+DELETE {{BASE_URL}}/posts/{{ENTITY_ID}}?populate[0]=author&fields=title HTTP/1.1
+Authorization: bearer {{authToken}}
+###

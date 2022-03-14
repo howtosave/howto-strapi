@@ -1,0 +1,35 @@
+#
+# auth
+#
+@BASE_URL=http://localhost:1337
+@USER_NAME=test001
+@USER_EMAIL=test001@local.host
+@USER_PASSWORD=test000
+
+# auth sign-up
+POST {{BASE_URL}}/auth/local/register  HTTP/1.1
+content-type: application/json
+
+{
+  "username": "{{USER_NAME}}",
+  "email": "{{USER_EMAIL}}",
+  "password": "{{USER_PASSWORD}}"
+}
+###
+
+# auth local
+# @name login
+POST {{BASE_URL}}/auth/local HTTP/1.1
+content-type: application/json
+
+{
+  "identifier": "{{USER_EMAIL}}",
+  "password": "{{USER_PASSWORD}}"
+}
+###
+@authToken = {{login.response.body.jwt}}
+
+# me
+GET {{BASE_URL}}/users/me HTTP/1.1
+Authorization: bearer {{authToken}}
+###
