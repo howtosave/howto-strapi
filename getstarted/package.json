@@ -4,10 +4,10 @@
   "version": "3.6.9",
   "description": "A Strapi application.",
   "scripts": {
-    "develop": "strapi develop",
+    "dev": "strapi develop",
     "develop:ce": "STRAPI_DISABLE_EE=true strapi develop",
     "start": "strapi start",
-    "build": "strapi build",
+    "build": "strapi build --no-optimization",
     "build:ce": "STRAPI_DISABLE_EE=true strapi build",
     "strapi": "strapi"
   },

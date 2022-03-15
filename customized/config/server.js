@@ -15,9 +15,9 @@ module.exports = ({ env }) => ({
   url: env("SERVER_URL", "https://api.server.com"),
   admin: {
     url: env("SERVER_URL", "https://api.server.com") + "/adminconsole",
+    watchIgnoreFiles: adminWatchIgnoreFiles,
     auth: {
       secret: env('ADMIN_JWT_SECRET', 'example-token'),
-      watchIgnoreFiles: adminWatchIgnoreFiles,
     },
   },
 });

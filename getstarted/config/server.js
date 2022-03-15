@@ -11,12 +11,12 @@ module.exports = ({ env }) => ({
   port: env.int('PORT', 1337),
   // server url
   // See https://strapi.io/documentation/developer-docs/latest/development/plugins/users-permissions.html#providers
-  url: env("SERVER_URL", "https://api.server.com"),
+  url: env("SERVER_URL", ""),
   admin: {
-    url: env("SERVER_URL", "https://api.server.com") + "/adminconsole",
+    url: "/adminconsole",
+    watchIgnoreFiles: adminWatchIgnoreFiles,
     auth: {
       secret: env('ADMIN_JWT_SECRET', 'example-token'),
-      watchIgnoreFiles: adminWatchIgnoreFiles,
     },
   },
 });
