@@ -1,7 +1,7 @@
 #
 # auth
 #
-@BASE_URL=http://localhost:1337/api
+@BASE_URL=http://localhost:1337
 @USER_NAME=test001
 @USER_EMAIL=test001@local.host
 @USER_PASSWORD=test000
@@ -40,7 +40,7 @@ content-type: application/json
 
 # find
 # @name find
-GET {{BASE_URL}}/posts/{{POST_ID}}/post-replies?sort=updatedAt:desc&populate=children HTTP/1.1
+GET {{BASE_URL}}/posts/{{POST_ID}}/post-replies?_sort=updatedAt:desc&populate=children HTTP/1.1
 ###
 
 @PARENT_ID = {{find.response.body.$[0].id}}

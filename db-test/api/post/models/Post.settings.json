@@ -2,9 +2,7 @@
   "kind": "collectionType",
   "collectionName": "posts",
   "info": {
-    "singularName": "post",
-    "pluralName": "posts",
-    "displayName": "Posts",
+    "name": "post",
     "description": "Collection for posts"
   },
   "options": {
@@ -20,9 +18,8 @@
       "type": "richtext"
     },
     "author": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
+      "plugin": "users-permissions",
+      "model": "user"
     },
     "meta": {
       "type": "json"

@@ -1,7 +1,7 @@
 #
 # auth
 #
-@BASE_URL=http://localhost:1337/api
+@BASE_URL=http://localhost:1337
 @USER_NAME=test001
 @USER_EMAIL=test001@local.host
 @USER_PASSWORD=test000
@@ -33,7 +33,7 @@ Authorization: bearer {{authToken}}
 
 # find
 # @name find
-GET {{BASE_URL}}/posts?populate=author&sort=id:desc&fields=title HTTP/1.1
+GET {{BASE_URL}}/posts?populate=author.id&_sort=id:desc HTTP/1.1
 Authorization: bearer {{authToken}}
 ###
 
@@ -41,12 +41,12 @@ Authorization: bearer {{authToken}}
 #@ENTITY_ID = {{find.response.body.data[0].id}}
 
 # findOne
-GET {{BASE_URL}}/posts/{{ENTITY_ID}}?populate=author&fields=title&fields=meta HTTP/1.1
+GET {{BASE_URL}}/posts/{{ENTITY_ID}}?populate=author.id HTTP/1.1
 Authorization: bearer {{authToken}}
 ###
 
 # update
-PUT {{BASE_URL}}/posts/{{ENTITY_ID}}?populate=author&fields=title HTTP/1.1
+PUT {{BASE_URL}}/posts/{{ENTITY_ID}}?populate=author.id HTTP/1.1
 content-type: application/json
 Authorization: bearer {{authToken}}
 
@@ -58,6 +58,6 @@ Authorization: bearer {{authToken}}
 ###
 
 # delete
-DELETE {{BASE_URL}}/posts/{{ENTITY_ID}}?populate[0]=author&fields=title HTTP/1.1
+DELETE {{BASE_URL}}/posts/{{ENTITY_ID}}?populate[0]=author.id HTTP/1.1
 Authorization: bearer {{authToken}}
 ###

@@ -1,10 +1,8 @@
 {
   "kind": "collectionType",
-  "collectionName": "post_replies",
+  "collectionName": "postreplies",
   "info": {
-    "singularName": "post-reply",
-    "pluralName": "post-replies",
-    "displayName": "PostReplies",
+    "name": "postreply",
     "description": "Collection for replies to posts"
   },
   "options": {
@@ -21,9 +19,7 @@
       "required": true
     },
     "children": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::post-reply.post-reply"
+      "collection": "postreply"
     },
     "parent": {
       "type": "string"
