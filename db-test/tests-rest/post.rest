@@ -1,7 +1,7 @@
 #
 # auth
 #
-@BASE_URL=http://localhost:1337
+@BASE_URL=http://localhost:1337/api
 @USER_NAME=test001
 @USER_EMAIL=test001@local.host
 @USER_PASSWORD=test000
@@ -41,7 +41,7 @@ Authorization: bearer {{authToken}}
 #@ENTITY_ID = {{find.response.body.data[0].id}}
 
 # findOne
-GET {{BASE_URL}}/posts/{{ENTITY_ID}}?populate=author.id HTTP/1.1
+GET {{BASE_URL}}/posts/{{ENTITY_ID}}?populate=author HTTP/1.1
 Authorization: bearer {{authToken}}
 ###
 

@@ -1,7 +1,7 @@
 #
 # auth
 #
-@BASE_URL=http://localhost:1337
+@BASE_URL=http://localhost:1337/api
 @USER_NAME=test001
 @USER_EMAIL=test001@local.host
 @USER_PASSWORD=test000
@@ -28,7 +28,7 @@ GET {{BASE_URL}}/posts HTTP/1.1
 
 # create post reply
 # @name postReply
-POST {{BASE_URL}}/posts/{{POST_ID}}/post-replies?populate=children HTTP/1.1
+POST {{BASE_URL}}/posts/{{POST_ID}}/post-replies HTTP/1.1
 content-type: application/json
 
 {

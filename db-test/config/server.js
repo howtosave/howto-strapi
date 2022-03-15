@@ -2,7 +2,7 @@
 const adminWatchIgnoreFiles = [
   "./build/**",
   "**/tests/**",
-  "**/tests-e2e/**",
+  "**/tests-*/**",
   "**/docs/*",
   "**/tools/*",
 ];
@@ -15,9 +15,9 @@ module.exports = ({ env }) => ({
   url: env("SERVER_URL", ""),
   admin: {
     url: env("SERVER_URL", "") + "/adminconsole",
+    watchIgnoreFiles: adminWatchIgnoreFiles,
     auth: {
       secret: env('ADMIN_JWT_SECRET', 'example-token'),
-      watchIgnoreFiles: adminWatchIgnoreFiles,
     },
   },
 });

@@ -13,5 +13,12 @@ module.exports = ({env}) => ({
     cors: {
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'Cache-Control'],
     },
+    logger: {
+      level: env("STRAPI_LOG_LEVEL", "debug"),
+      // request log
+      requests:
+        env("STRAPI_LOG_LEVEL") === "debug" ||
+        env("STRAPI_LOG_LEVEL") === "trace",
+    },
   },
 });

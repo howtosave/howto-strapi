@@ -10,6 +10,12 @@ const outputDir = pathJoin(__dirname, 'input-data');
 const email = 'test001@local.host';
 const password = 'test000';
 
+const dataCount = {
+  post: 10,
+  reply: 5, // per post
+  replyreply: 3, // per reply
+};
+
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -41,8 +47,12 @@ function genReplyReply(r) {
   });
 }
 
-function jsonToCsv(arr, auth) {
-  const row = arr.map((e) => Object.values(e).concat([auth]).join(","));
+function jsonToCsv(arr, auth, fields) {
+  const row = arr.map((e) => {
+    const cols = [];
+    for (const k of fields) cols.push(e[k]);
+    return cols.concat([auth]).join(",")
+  });
   return row.join("\n") + "\n"; // append last LF
 }
 
@@ -139,11 +149,11 @@ const do_post_data = async ({ path, count, auth, getData, fileName, }) => {
   const posts = await do_post_data({
     auth,
     path: '/posts',
-    count: 10,
+    count: dataCount.post,
     getData: genPost,
   });
   // save to file
-  fs.writeFile(pathJoin(outputDir, 'posts.csv'), jsonToCsv(posts, auth), (err) => {
+  fs.writeFile(pathJoin(outputDir, 'posts.csv'), jsonToCsv(posts, auth, ["id", "title", "content"]), (err) => {
     if (err) console.error(err);
   });
   console.log(">>> DONE -- posts");
@@ -153,7 +163,7 @@ const do_post_data = async ({ path, count, auth, getData, fileName, }) => {
     const promises = posts.map((e) => {
       return do_post_data({
         path: `/posts/${e.id}/post-replies`,
-        count: 5,
+        count: dataCount.reply,
         getData: genReply(e),
       });
     });
@@ -163,9 +173,9 @@ const do_post_data = async ({ path, count, auth, getData, fileName, }) => {
     for (const json of replies) {
       if (trunc) {
         trunc = false;
-        fs.writeFileSync(pathJoin(outputDir, fileName), jsonToCsv(json, auth));
+        fs.writeFileSync(pathJoin(outputDir, fileName), jsonToCsv(json, auth, ["id", "content", "post", "parent"]));
       } else { // append
-        fs.appendFileSync(pathJoin(outputDir, fileName), jsonToCsv(json, auth));
+        fs.appendFileSync(pathJoin(outputDir, fileName), jsonToCsv(json, auth, ["id", "content", "post", "parent"]));
       }
     }
     console.log(">>> DONE -- post-replies");
@@ -176,13 +186,13 @@ const do_post_data = async ({ path, count, auth, getData, fileName, }) => {
       const prm2 = rep.map((e) => {
         return do_post_data({
           path: `/posts/${e.post}/post-replies/${e.id}`,
-          count: 3,
+          count: dataCount.replyreply,
           getData: genReplyReply(e),
         });
       });
       const reprep = await Promise.all(prm2);
       for (const json of reprep) {
-        fs.appendFileSync(pathJoin(outputDir, fileName), jsonToCsv(json, auth));
+        fs.appendFileSync(pathJoin(outputDir, fileName), jsonToCsv(json, auth, ["id", "content", "post", "parent"]));
       }
     }
     console.log(">>> DONE -- post-reply-replies");

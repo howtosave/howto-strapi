@@ -2,7 +2,7 @@
   "kind": "collectionType",
   "collectionName": "postreplies",
   "info": {
-    "name": "postreply",
+    "name": "PostReply",
     "description": "Collection for replies to posts"
   },
   "options": {

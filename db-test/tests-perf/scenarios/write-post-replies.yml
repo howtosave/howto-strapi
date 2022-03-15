@@ -11,8 +11,7 @@ config:
       - "id"
       - "content"
       - "post"
-      - "createdAt"
-      - "updatedAt"
+      - "parent"
       - "authToken"
 
 scenarios:

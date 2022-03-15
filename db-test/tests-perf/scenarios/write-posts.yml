@@ -11,9 +11,6 @@ config:
       - "id"
       - "title"
       - "content"
-      - "createdAt"
-      - "updatedAt"
-      - "meta"
       - "authToken"
 
 scenarios:

@@ -118,4 +118,6 @@ documentation
 # Misc.
 ##
 
-/tests-perf/input-data
+/tests-perf/input-data/*
+!/tests-perf/input-data/.git-keep
+
